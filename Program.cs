@@ -143,8 +143,6 @@ namespace TeaShoot_3
                 removeList.Clear();
                 if (!isDevelop) {
                     //スクロール
-                    if (IsScroll && FPS < fps + 50)
-                    {
                         ScrollNum++;
                         if(ScrollNum > 50)
                         {
@@ -159,7 +157,6 @@ namespace TeaShoot_3
                                 }
                             }
                         }
-                    }
                     //上
                     if (CheckHitKey(KEY_INPUT_W) == TRUE)
                     {

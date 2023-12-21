@@ -36,8 +36,6 @@ namespace TeaShoot_3
                     b1.x += (float)Math.Cos(angle);
                     b1.y += (float)Math.Sin(angle);
 
-                    Console.WriteLine(b1.x.ToString() + "," + b1.y.ToString());
-
                     break;
                 case boss1.attackType.ShieldWall:
                     b1b.attackWait++;
@@ -52,7 +50,7 @@ namespace TeaShoot_3
                         {
                             if(b1b.y != z)
                             {
-                                var ao = ResistIndexOf(14);
+                                var ao = Clone(ResistIndexOf(14));
 
                                 ao.x = 640;
                                 ao.y = z * player.height;

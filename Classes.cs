@@ -177,6 +177,19 @@ namespace TeaShoot_3
                         }
                     }
                     break;
+                case MoveType.BoundX0:
+
+                    x += speedX;
+                    y += speedY;
+                    if (y < 0)
+                    {
+                        speedY *= -1;
+                        RemoveBoundCount++;
+                        if (RemoveBoundCountMax != -1 && RemoveBoundCount >= RemoveBoundCountMax)
+                        {
+                            move = MoveType.Speed;
+                            speedY *= -1;
+                        }
             }
             switch (attack)
             {
