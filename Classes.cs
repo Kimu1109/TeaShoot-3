@@ -378,7 +378,9 @@ namespace TeaShoot_3
             Nothing = 0,
             Normal = 1,
             NormalFire = 2,
-            Boss1 = 3
+            Boss1 = 3,
+            Boss1_Fishing_Rod = 300,
+            Boss1_Fishing_Fish = 301,
         }
         public enum RemoveType
         {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using static TeaShoot_3.obj;
 using static DxLibDLL.DX;
 using Microsoft.VisualBasic;
+using static TeaShoot_3.boss2;
 
 namespace TeaShoot_3
 {
@@ -17,7 +18,25 @@ namespace TeaShoot_3
 
             var b1b = b1.boss1;
 
+            switch (b1b.attack)
+            {
+                case boss1.attackType.MoveFirst:
+                    if (Math.Sqrt(Math.Pow(b1.x - (640 - b1.width), 2) + Math.Pow(b1.y - (240 - b1.height / 2), 2)) <= 10)
+                    {
+                        b1b.nextAttack();
+                    }
+                    double angle = Math.Atan2(b1.y - (240 - b1.height / 2), b1.x - (640 - b1.width));
 
+                    b1.x -= (float)Math.Cos(angle);
+                    b1.y -= (float)Math.Sin(angle);
+
+                    break;
+                case boss1.attackType.Fishing:
+
+
+
+                    break;
+            }
 
         }
         public static void ProcessBoss2(int i)
@@ -80,6 +99,47 @@ namespace TeaShoot_3
     [Serializable]
     public class boss1
     {
+        public attackType attack;
+        public int attackWait;
+        public int attackNum;
+        public bool isRandom;
+
+        public int x;
+        public int y;
+
+        public enum attackType
+        {
+            MoveFirst = 0,
+            Fishing = 1,
+            Kidding = 2,
+            Punch = 3,
+            NewDir = 4,
+            BoundFish = 5,
+            PunchPlus = 6,
+            MoveLast = 7
+        }
+        public void nextAttack()
+        {
+            if (!isRandom)
+            {
+                if (attack == attackType.PunchPlus)
+                {
+                    isRandom = true;
+                }
+                else
+                {
+                    attack = (attackType)((int)attack + 1);
+                    attackNum = 0;
+                    attackWait = 0;
+                }
+            }
+            if (isRandom)
+            {
+                attack = (attackType)obj.rnd.Next((int)attackType.Fishing, (int)attackType.PunchPlus);
+                attackNum = 0;
+                attackWait = 0;
+            }
+        }
 
     }
 
