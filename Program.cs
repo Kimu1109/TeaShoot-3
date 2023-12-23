@@ -67,6 +67,8 @@ namespace TeaShoot_3
         static long debugTime;
         static long debugStartTime;
 
+        static bool IsF4;
+
         [STAThread]
         public static void Main()
         {
@@ -143,20 +145,20 @@ namespace TeaShoot_3
                 removeList.Clear();
                 if (!isDevelop) {
                     //スクロール
-                        ScrollNum++;
-                        if(ScrollNum > 50)
+                    ScrollNum++;
+                    if (ScrollNum > 50)
+                    {
+                        ScrollNum = 0;
+                        ScrollX++;
+                        if (ScrollX < mapList.Count)
                         {
-                            ScrollNum = 0;
-                            ScrollX++;
-                            if(ScrollX < mapList.Count)
+                            foreach (var abc in mapList[ScrollX])
                             {
-                                foreach (var abc in mapList[ScrollX])
-                                {
-                                    if (abc != null)
-                                        objList.Add(obj.Clone(abc));
-                                }
+                                if (abc != null)
+                                    objList.Add(obj.Clone(abc));
                             }
                         }
+                    }
                     //上
                     if (CheckHitKey(KEY_INPUT_W) == TRUE)
                     {
@@ -223,7 +225,8 @@ namespace TeaShoot_3
             long sleepTime = idealSleep - (newTime - oldTime) - error; // 休止できる時間  
             oldTime = newTime;
             if(sleepTime < 1) { sleepTime = 1; }
-            WaitTimer((int)(sleepTime)); // 休止  
+            if (sleepTime > 10) { sleepTime = 10; }
+            if(!IsF4) WaitTimer((int)(sleepTime)); // 休止  
             newTime = (long)(DateAndTime.Timer * 1000);
             error = newTime - oldTime - sleepTime; // 休止時間の誤差  
         }
@@ -232,11 +235,13 @@ namespace TeaShoot_3
         /// </summary>
         private static void FPS_Controller_Before()
         {
+            if (CheckHitKey(KEY_INPUT_F4) == TRUE) IsF4 = true; else IsF4 = false; 
+
             oldTime = newTime;
             debugTime = newTime;
 
             ClearDrawScreen();
-            if((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawString(50, 20, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)), GetColor(255, 255, 255));
+            if((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawString(50, 20, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)) + "\nScrollX:" + ScrollX.ToString(), GetColor(255, 255, 255));
 
             DrawBox(0, 0, player.hp, 20, GetColor(255, 0, 0), 1);
             DrawBox(0, 0, 255, 20, GetColor(255, 255, 255), 0);

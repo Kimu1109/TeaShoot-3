@@ -15,54 +15,59 @@ namespace TeaShoot_3
         {
             var b1 = objList[i];
 
-            if (b1.boss1 == null)
-            {
-                b1.boss1 = new boss1();
-                b1.boss1.attack = boss1.attackType.MoveFirst;
-            }
-
             var b1b = b1.boss1;
 
-            switch (b1b.attack)
+
+
+        }
+        public static void ProcessBoss2(int i)
+        {
+            var b2 = objList[i];
+
+            var b2b = b2.boss2;
+
+            switch (b2b.attack)
             {
-                case boss1.attackType.MoveFirst:
+                case boss2.attackType.MoveFirst:
 
-                    if((int)b1.x == 640 - b1.width && (int)b1.y == 480 - b1.height / 2)
+                    if (Math.Sqrt(Math.Pow(b2.x - (640 - b2.width),2) + Math.Pow(b2.y - (240 - b2.height / 2),2)) <= 10)
                     {
-                        b1b.nextAttack();
+                        b2b.nextAttack();
                     }
-                    double angle = Math.Atan2(b1.x - (640 - b1.width), b1.y - (480 - b1.height / 2));
+                    double angle = Math.Atan2(b2.y - (240 - b2.height / 2) , b2.x - (640 - b2.width));
 
-                    b1.x += (float)Math.Cos(angle);
-                    b1.y += (float)Math.Sin(angle);
+                    b2.x -= (float)Math.Cos(angle);
+                    b2.y -= (float)Math.Sin(angle);
 
                     break;
-                case boss1.attackType.ShieldWall:
-                    b1b.attackWait++;
-                    if(b1b.attackWait > 50)
+                case boss2.attackType.ShieldWall:
+                    b2b.attackWait++;
+                    if(b2b.attackWait >= 120)
                     {
-                        b1b.attackWait = 0;
+                        b2b.attackWait = 0;
 
-                        b1b.y++;
-                        if (b1b.y >= 480 / player.height) b1b.y = 0;
+                        b2b.y++;
+                        if (b2b.y >= 480 / player.height) b2b.y = 0;
 
                         for(int z = 0; z < 480 / player.height; z++)
                         {
-                            if(b1b.y != z)
+                            if(b2b.y >= z - 3 && b2b.y <= z + 3)
                             {
                                 var ao = Clone(ResistIndexOf(14));
 
                                 ao.x = 640;
                                 ao.y = z * player.height;
+                                ao.speedX = -1;
+                                ao.move = MoveType.BoundX0;
 
                                 objList.Add(ao);
                             }
                         }
 
-                        b1b.attackNum++;
-                        if(b1b.attackNum > 20)
+                        b2b.attackNum++;
+                        if(b2b.attackNum > 20)
                         {
-                            b1b.nextAttack();
+                            b2b.nextAttack();
                         }
                     }
                     break;
@@ -74,6 +79,12 @@ namespace TeaShoot_3
     }
     [Serializable]
     public class boss1
+    {
+
+    }
+
+    [Serializable]
+    public class boss2
     {
         public attackType attack;
         public int attackWait;

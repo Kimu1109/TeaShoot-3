@@ -82,8 +82,8 @@ namespace TeaShoot_3
 
         public bool isInit;
 
+        public boss2 boss2 = new boss2();
         public boss1 boss1 = new boss1();
-
 
         //共通変数　及び　環境変数
         public static int camX;
@@ -181,15 +181,8 @@ namespace TeaShoot_3
 
                     x += speedX;
                     y += speedY;
-                    if (y < 0)
-                    {
-                        speedY *= -1;
-                        RemoveBoundCount++;
-                        if (RemoveBoundCountMax != -1 && RemoveBoundCount >= RemoveBoundCountMax)
-                        {
-                            move = MoveType.Speed;
-                            speedY *= -1;
-                        }
+                    if (x < 0) speedX *= -1;
+                    break;            
             }
             switch (attack)
             {
@@ -272,6 +265,7 @@ namespace TeaShoot_3
         public static void WriteObj(obj obj, string path)
         {
             if (obj == null) return;
+            obj.boss2 = new boss2();
             obj.boss1 = new boss1();
             using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
@@ -375,7 +369,8 @@ namespace TeaShoot_3
             Angle = 1,
             ShakeAndNear = 2,
             LittleNear = 3,
-            Bound = 4
+            Bound = 4,
+            BoundX0 = 5
         }
         //命名法則: 基本逆で書くこと,Fire=間隔が早い,Little=間隔が遅い or 効果が弱い
         public enum AttackType
