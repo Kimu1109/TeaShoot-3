@@ -145,7 +145,6 @@ namespace TeaShoot_3
                                     {
                                         b1.x = -b1.width;
                                         b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                        b1b.isLeft = false;
                                     }
                                 }
                             }
@@ -201,6 +200,31 @@ namespace TeaShoot_3
                                 }
                             }
                             break;
+                    }
+
+                    if(b1b.attackNum >= 30)
+                    {
+                        b1b.nextAttack();
+                    }
+
+                    b1b.shotWait++;
+                    if(b1b.shotWait >= 50)
+                    {
+                        b1b.shotWait = 0;
+                        b1b.shotY += (int)player.height;
+                        if (b1b.shotY >= 480 - (int)player.height) b1b.shotY = 0;
+                        var o14 = Clone(ResistIndexOf(14));
+                        if (!b1b.isLeft)
+                            o14.x = -o14.width;
+                        else
+                        {
+
+                        }
+                        o14.y = b1b.shotY;
+                        var edb = Math.Atan2(player.y - o14.y, player.x - o14.x);
+                        o14.speedX = (float)(Math.Cos(edb) * 3);
+                        o14.speedY = (float)(Math.Cos(edb) * 3);
+                        objList.Add(o14);
                     }
 
                     break;
