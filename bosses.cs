@@ -151,7 +151,55 @@ namespace TeaShoot_3
                             }
                             break;
                         case boss1.kiddingType.RandomY:
-
+                            if (b1b.kiddingInit)
+                            {
+                                b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                b1.x = -b1.width;
+                                b1b.kiddingInit = false;
+                            }
+                            if (!b1b.isLeft)
+                            {
+                                if (b1.x == -b1.width)
+                                {
+                                    var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
+                                    b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
+                                    b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
+                                }
+                                b1.x += b1b.speedX;
+                                b1.y += b1b.speedY;
+                                if (b1.x > 640 || b1.y < 0 - b1.height || b1.y > 480)
+                                {
+                                    b1.x = 640;
+                                    b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                    b1b.isLeft = true;
+                                }
+                            }
+                            else
+                            {
+                                if (b1.x == 640)
+                                {
+                                    var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
+                                    b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
+                                    b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
+                                }
+                                b1.x += b1b.speedX;
+                                b1.y += b1b.speedY;
+                                if (b1.x < -b1.width || b1.y < 0 - b1.height || b1.y > 480)
+                                {
+                                    b1b.attackNum++;
+                                    if (b1b.attackNum % 5 == 0)
+                                    {
+                                        b1b.kiddingInit = true;
+                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY);
+                                    }
+                                    else
+                                    {
+                                        b1.x = -b1.width;
+                                        b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                        b1b.isLeft = false;
+                                    }
+                                }
+                            }
                             break;
                     }
 
