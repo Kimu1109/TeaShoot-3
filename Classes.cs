@@ -360,7 +360,18 @@ namespace TeaShoot_3
             }
             return resistList[0];
         }
-
+        /// <summary>
+        /// asciiフォルダの.txtファイルから文字列を読み込み、返します。
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string ReadAscii(string fileName)
+        {
+            using(var sr = new StreamReader(@".\ascii\" + fileName + ".txt"))
+            {
+                return sr.ReadToEnd();
+            }
+        }
 
         public enum MoveType
         {

@@ -33,7 +33,41 @@ namespace TeaShoot_3
                     break;
                 case boss1.attackType.Fishing:
 
+                    if(b1b.y == 0)
+                    {
+                        b1.FitText(ReadAscii("boss1-fishing"));
+                        b1b.y = -1;
+                    }
 
+                    b1b.x++;
+                    if(b1b.x >= 100)
+                    {
+                        b1b.x = 0;
+                        b1b.attackNum++;
+
+                        var Rod = Clone(ResistIndexOf(15));
+                        Rod.x = rnd.Next(0, 640);
+                        Rod.y = -Rod.height;
+                        Rod.remove = RemoveType.Big;
+
+                        objList.Add(Rod);
+                        if (b1b.attackNum > 30)
+                        {
+                            b1b.nextAttack();
+                        }
+
+                    }
+
+                    break;
+                case boss1.attackType.Kidding:
+
+                    if (b1b.y == 0)
+                    {
+                        b1.FitText(ReadAscii("boss1-kidding"));
+                        b1b.y = -1;
+                    }
+
+                    
 
                     break;
             }
@@ -131,6 +165,8 @@ namespace TeaShoot_3
                     attack = (attackType)((int)attack + 1);
                     attackNum = 0;
                     attackWait = 0;
+                    x = 0;
+                    y = 0;
                 }
             }
             if (isRandom)
@@ -138,6 +174,8 @@ namespace TeaShoot_3
                 attack = (attackType)obj.rnd.Next((int)attackType.Fishing, (int)attackType.PunchPlus);
                 attackNum = 0;
                 attackWait = 0;
+                x = 0;
+                y = 0;
             }
         }
 
