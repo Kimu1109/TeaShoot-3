@@ -15,6 +15,8 @@ namespace TeaShoot_3
         {
             var b1 = objList[i];
 
+            if (b1.boss1 == null) b1.boss1 = new boss1();
+
             var b1b = b1.boss1;
 
             switch (b1b.attack)
@@ -63,10 +65,31 @@ namespace TeaShoot_3
                     if (b1b.y == 0)
                     {
                         b1.FitText(ReadAscii("boss1-kidding"));
+                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY);
                         b1b.y = -1;
+                        b1b.isLeft = false;
                     }
 
-                    
+                    switch (b1b.kidding)
+                    {
+                        case boss1.kiddingType.UpToDownWithSideMove:
+                            if (!b1b.isLeft)
+                            {
+                                b1.x += 3;
+                                if(b1.x > 640) b1b.isLeft = true;
+                            }
+                            else
+                            {
+                                b1.x -= 3;
+                            }
+                            break;
+                        case boss1.kiddingType.MoveToPlayer:
+
+                            break;
+                        case boss1.kiddingType.RandomY:
+
+                            break;
+                    }
 
                     break;
             }
@@ -75,6 +98,8 @@ namespace TeaShoot_3
         public static void ProcessBoss2(int i)
         {
             var b2 = objList[i];
+
+            if(b2.boss2 == null) b2.boss2 = new boss2();
 
             var b2b = b2.boss2;
 
@@ -136,9 +161,12 @@ namespace TeaShoot_3
         public int attackWait;
         public int attackNum;
         public bool isRandom;
+        public kiddingType kidding;
 
         public int x;
         public int y;
+
+        public bool isLeft;
 
         public enum attackType
         {
@@ -150,6 +178,12 @@ namespace TeaShoot_3
             BoundFish = 5,
             PunchPlus = 6,
             MoveLast = 7
+        }
+        public enum kiddingType
+        {
+            UpToDownWithSideMove = 0,
+            MoveToPlayer = 1,
+            RandomY = 2,
         }
         public void nextAttack()
         {

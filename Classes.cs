@@ -82,8 +82,8 @@ namespace TeaShoot_3
 
         public bool isInit;
 
-        public boss2 boss2 = new boss2();
-        public boss1 boss1 = new boss1();
+        public boss2 boss2;
+        public boss1 boss1;
 
         //共通変数　及び　環境変数
         public static int camX;
