@@ -32,7 +32,8 @@ namespace TeaShoot_3
         public int hp { get; set; }
         [Category("タイプ")]
         public int shotNum { get; set; }
-
+        [Category("タイプ")]
+        public int score { get; set; }
 
 
         [Category("位置")]
@@ -224,6 +225,10 @@ namespace TeaShoot_3
                     {
                         if(!isDevelop) removeList.Add(this);
                         objList[touchIndex].hp--;
+                        if (objList[touchIndex].hp <= 0)
+                        {
+                            player.score += objList[touchIndex].score;
+                        }
                     }
                     break;
                 case ObjType.Player:
