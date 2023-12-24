@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using static TeaShoot_3.obj;
 using static DxLibDLL.DX;
 using Microsoft.VisualBasic;
-using static TeaShoot_3.boss2;
 
 namespace TeaShoot_3
 {
