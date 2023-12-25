@@ -76,6 +76,11 @@ namespace TeaShoot_3
         }
         [Category("バウンド")]
         public int RemoveBoundCountMax { get; set; }
+        [Category("バウンド")]
+        public int SuperBoundNum { get; set; }
+        public int SuperBoundCount;
+        public bool IsBound;
+
         public int RemoveBoundCount;
 
         public uint textColor;
@@ -112,6 +117,7 @@ namespace TeaShoot_3
             if (!isInit)
             {
                 isInit = true;
+                IsBound = true;
                 switch (init)
                 {
                     case InitType.Nothing:
@@ -124,7 +130,7 @@ namespace TeaShoot_3
                         break;
                     case InitType.Y0_XAuto:
                         autoX += 50;
-                        if(autoX > 640) { autoX = 0; }
+                        if (autoX > 640) { autoX = 0; }
                         x = autoX;
                         y = 0;
                         break;
@@ -157,7 +163,7 @@ namespace TeaShoot_3
                     POAngle = Math.Atan2(y - player.y, x - player.x);
                     x -= (float)(Math.Cos(POAngle) * 2);
                     y -= (float)(Math.Sin(POAngle) * 2);
-                    if(Math.Sqrt(Math.Pow(x - player.x,2) + Math.Pow(y - player.y,2)) < 70)
+                    if (Math.Sqrt(Math.Pow(x - player.x, 2) + Math.Pow(y - player.y, 2)) < 70)
                     {
                         move = MoveType.Speed;
                         speedX = -(float)(Math.Cos(POAngle) * 2);
@@ -183,13 +189,71 @@ namespace TeaShoot_3
                     x += speedX;
                     y += speedY;
                     if (x < 0) speedX *= -1;
-                    break;            
+                    break;
+                case MoveType.LittleNearAndGoAwayFromBall:
+                    POAngle = Math.Atan2(y - player.y, x - player.x);
+                    x -= (float)(Math.Cos(POAngle) * 2);
+                    y -= (float)(Math.Sin(POAngle) * 2);
+                    if (Math.Sqrt(Math.Pow(x - player.x, 2) + Math.Pow(y - player.y, 2)) < 70)
+                    {
+                        move = MoveType.Speed;
+                        speedX = -(float)(Math.Cos(POAngle) * 2);
+                        speedY = -(float)(Math.Sin(POAngle) * 2);
+                    }
+                    foreach (var o in objList)
+                    {
+                        if (o.type == ObjType.Ball)
+                        {
+                            if (DistanceP(point, o.point) <= 100)
+                            {
+                                TwoPointToSpeed(this, this.point, o.point);
+                                x -= speedX;
+                                y -= speedY;
+                            }
+                        }
+                    }
+                    break;
+                case MoveType.BoundSuper:
+
+                    speedY += 0.02f;
+
+                    if (IsBound)
+                    {
+                        switch (IsAllDrawingRange(true))
+                        {
+                            case 0:
+                                break;
+                            case 1:
+                                speedY *= -0.8f;
+                                SuperBoundCount++;
+                                if (SuperBoundCount >= SuperBoundNum)
+                                {
+                                    speedY *= 2;
+                                    SuperBoundCount = 0;
+                                }
+                                break;
+                            case 2:
+                                speedX *= -0.8f;
+                                SuperBoundCount++;
+                                if (SuperBoundCount >= SuperBoundNum)
+                                {
+                                    speedX *= 2;
+                                    SuperBoundCount = 0;
+                                }
+                                break;
+                        }
+                    }
+
+                    x += speedX;
+                    y += speedY;
+                    
+                    break;
             }
             switch (attack)
             {
                 case AttackType.Normal:
                     shotInterval++;
-                    if(shotInterval > 80)
+                    if (shotInterval > 80)
                     {
                         shotInterval = 0;
                         var shotObj = obj.Clone(ResistIndexOf(shotNum));
@@ -223,7 +287,7 @@ namespace TeaShoot_3
                     touchIndex = Touch_obj(i, new ObjType[] { ObjType.Player, ObjType.Ball });
                     if (touchIndex != -1)
                     {
-                        if(!isDevelop) removeList.Add(this);
+                        if (!isDevelop) removeList.Add(this);
                         objList[touchIndex].hp--;
                         if (objList[touchIndex].hp <= 0)
                         {
@@ -241,7 +305,7 @@ namespace TeaShoot_3
                                 hp--;
                                 break;
                             case ObjType.EnemyBall:
-                                hp-= objList[touchIndex].hp;
+                                hp -= objList[touchIndex].hp;
                                 removeList.Add(objList[touchIndex]);
                                 break;
                         }
@@ -311,7 +375,7 @@ namespace TeaShoot_3
                 if (z != i)
                 {
                     var CObj = objList[z];
-                    if(CObj.x > 0 + camX && CObj.x < 640 - CObj.width + camX)
+                    if (CObj.x > 0 + camX && CObj.x < 640 - CObj.width + camX)
                     {
                         if (TObj.x < CObj.x + CObj.width &&
                             TObj.x + TObj.width > CObj.x &&
@@ -372,7 +436,7 @@ namespace TeaShoot_3
         /// <returns></returns>
         public static string ReadAscii(string fileName)
         {
-            using(var sr = new StreamReader(@".\ascii\" + fileName + ".txt"))
+            using (var sr = new StreamReader(@".\ascii\" + fileName + ".txt"))
             {
                 return sr.ReadToEnd();
             }
@@ -382,11 +446,79 @@ namespace TeaShoot_3
         {
             return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
         }
-        public static void TwoPointToSpeed(obj o, double x1, double y1, double x2, double y2)
+        public static double DistanceP(Point p1, Point p2)
         {
-            var angle = Math.Atan2(y2 - y1, x2 - x1);
-            o.speedX = (float)Math.Cos(angle);
-            o.speedY = (float)Math.Sin(angle);
+            return Math.Sqrt(Math.Pow(p1.x - p2.x, 2) + Math.Pow(p1.y - p2.y, 2));
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="type">0は=
+        /// 1は足し算
+        /// 2は引き算
+        /// </param>
+        public static void TwoPointToSpeed(obj o, Point p1, Point p2, int type = 0)
+        {
+            double angle;
+            switch (type)
+            {
+                case 0:
+                    angle = Math.Atan2(p2.y - p1.y, p2.x - p1.x);
+                    o.speedX = (float)Math.Cos(angle);
+                    o.speedY = (float)Math.Sin(angle);
+                    break;
+                case 1:
+                    angle = Math.Atan2(p2.y - p1.y, p2.x - p1.x);
+                    o.speedX += (float)Math.Cos(angle);
+                    o.speedY += (float)Math.Sin(angle);
+                    break;
+                case 2:
+                    angle = Math.Atan2(p2.y - p1.y, p2.x - p1.x);
+                    o.speedX -= (float)Math.Cos(angle);
+                    o.speedY -= (float)Math.Sin(angle);
+                    break;
+            }
+        }
+        /// <summary>
+        /// 0 = 入ってる 
+        /// 1=Y座標が原因で入っていない 
+        /// 2=X座標が原因で入っていない
+        /// </summary>
+        /// <returns></returns>
+        public int IsAllDrawingRange(bool IsFit = false)
+        {
+            if(x >= 0 && x <= 640 - width && y >= 0 && y <= 480 - height)
+                return 0;
+            else
+            {
+                if (x >= 0 && x <= 640 - width)
+                {
+                    if (IsFit)
+                    {
+                        if (!(x >= 0)) x = 0;
+                        if (!(x <= 640 - width)) x = 640 - width;
+                        if (!(y >= 0)) y = 0;
+                        if (!(y <= 480 - height)) y = 480 - height;
+                    }
+                    return 1;
+                }
+                else
+                {
+                    if (IsFit)
+                    {
+                        if (!(x >= 0)) x = 0;
+                        if (!(x <= 640 - width)) x = 640 - width;
+                        if (!(y >= 0)) y = 0;
+                        if (!(y <= 480 - height)) y = 480 - height;
+                    }
+                    return 2;
+                }
+            }
         }
         public enum MoveType
         {
@@ -396,7 +528,9 @@ namespace TeaShoot_3
             ShakeAndNear = 2,
             LittleNear = 3,
             Bound = 4,
-            BoundX0 = 5
+            BoundX0 = 5,
+            LittleNearAndGoAwayFromBall = 6,
+            BoundSuper = 7
         }
         //命名法則: 基本逆で書くこと,Fire=間隔が早い,Little=間隔が遅い or 効果が弱い
         public enum AttackType
@@ -446,9 +580,9 @@ namespace TeaShoot_3
             s -= minute * 60;
             int second = s;
 
-            if(hour != 0) { r += hour.ToString() + "時"; }
-            if(minute != 0) { r += minute.ToString() + "分"; }
-            if(second != 0) { r += second.ToString() + "秒"; }
+            if (hour != 0) { r += hour.ToString() + "時"; }
+            if (minute != 0) { r += minute.ToString() + "分"; }
+            if (second != 0) { r += second.ToString() + "秒"; }
             return r;
         }
         public override string ToString()
@@ -462,6 +596,14 @@ namespace TeaShoot_3
             get
             {
                 return (int)x - camX;
+            }
+        }
+        [Browsable(false)]
+        public Point point
+        {
+            get
+            {
+                return new Point(x, y);
             }
         }
     }

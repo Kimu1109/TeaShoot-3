@@ -243,8 +243,6 @@ namespace TeaShoot_3
                         objList.Add(o14);
                     }
 
-                    DrawString(200, 200, b1b.kidding.ToString() + "\n" + b1b.attackNum.ToString() + "\n" + b1b.speedX + "\n" + b1b.speedY + "\n" + b1b.x + "\n" + b1b.y, GetColor(0, 255, 0));
-
                     break;
                 case boss1.attackType.Punch:
 
@@ -257,16 +255,85 @@ namespace TeaShoot_3
                     if(b1b.y == -1)
                     {
                         var MainPoint = new Point(640 - b1.width, 240 - b1.height / 2);
-                        TwoPointToSpeed(b1, b1.x, b1.y, MainPoint.x, MainPoint.y);
-                        b1.speedX *= 2;
-                        b1.speedY *= 2;
-                        if(Distance(b1.x,b1.y, MainPoint.x, MainPoint.y) <= 10)  b1b.y = -2;
+                        TwoPointToSpeed(b1, b1.point, MainPoint);
+                        b1.x += b1.speedX * 2;
+                        b1.y += b1.speedY * 2;
+                        if(DistanceP(b1.point, MainPoint) <= 10)  b1b.y = -2;
+                        Console.WriteLine(DistanceP(b1.point, MainPoint));
                     }
 
                     if(b1b.y == -2)
                     {
-
+                        b1b.attackWait++;
+                        if(b1b.attackWait >= 20)
+                        {
+                            b1b.attackWait = 0;
+                            var o14 = Clone(ResistIndexOf(14));
+                            o14.move = MoveType.LittleNearAndGoAwayFromBall;
+                            o14.x = 640;
+                            o14.y = b1b.x;
+                            objList.Add(o14);
+                            b1b.attackNum++;
+                            b1b.x += (int)player.height;
+                            if(b1b.x >= 480) { b1b.x = 0; }
+                        }
+                        if(b1b.attackNum > 200)
+                        {
+                            b1b.nextAttack();
+                        }
                     }
+
+                    SetWindowText(b1b.y.ToString());
+
+                    break;
+                case boss1.attackType.BoundFish:
+
+                    if (b1b.y == 0)
+                    {
+                        b1b.y = -1;
+                        b1.FitText(ReadAscii("boss1-punch"));
+                    }
+
+                    if (b1b.y == -1)
+                    {
+                        var MainPoint = new Point(640 - b1.width, 240 - b1.height / 2);
+                        TwoPointToSpeed(b1, b1.point, MainPoint);
+                        b1.x += b1.speedX * 2;
+                        b1.y += b1.speedY * 2;
+                        if (DistanceP(b1.point, MainPoint) <= 10) b1b.y = -2;
+                        Console.WriteLine(DistanceP(b1.point, MainPoint));
+                    }
+
+                    if (b1b.y == -2)
+                    {
+                        b1b.attackWait++;
+                        if (b1b.attackWait >= 20)
+                        {
+                            b1b.attackWait = 0;
+                            var o14 = Clone(ResistIndexOf(14));
+                            o14.move = MoveType.BoundSuper;
+                            o14.x = 640;
+                            o14.y = b1b.x;
+                            o14.speedX = -3;
+                            o14.SuperBoundNum = 5;
+                            objList.Add(o14);
+                            b1b.attackNum++;
+                            b1b.x += (int)player.height;
+                            if (b1b.x >= 480) { b1b.x = 0; }
+                        }
+                        if (b1b.attackNum > 200)
+                        {
+                            b1b.nextAttack();
+                        }
+                    }
+
+                    break;
+                case boss1.attackType.PunchPlus:
+
+
+                    break;
+                case boss1.attackType.MoveLast:
+
 
                     break;
             }
@@ -362,10 +429,9 @@ namespace TeaShoot_3
             Fishing = 1,
             Kidding = 2,
             Punch = 3,
-            NewDir = 4,
-            BoundFish = 5,
-            PunchPlus = 6,
-            MoveLast = 7
+            BoundFish = 4,
+            PunchPlus = 5,
+            MoveLast = 6
         }
         public enum kiddingType
         {
@@ -384,7 +450,7 @@ namespace TeaShoot_3
                 else
                 {
                     attack = (attackType)((int)attack + 1);
-                    if (attack == attackType.Fishing) attack = attackType.Kidding;
+                    if (attack == attackType.Fishing) attack = attackType.BoundFish;
                     attackNum = 0;
                     attackWait = 0;
                     x = 0;
