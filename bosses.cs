@@ -227,6 +227,32 @@ namespace TeaShoot_3
                         objList.Add(o14);
                     }
 
+                    DrawString(200, 200, b1b.kidding.ToString() + "\n" + b1b.attackNum.ToString() + "\n" + b1b.speedX + "\n" + b1b.speedY + "\n" + b1b.x + "\n" + b1b.y, GetColor(0, 255, 0));
+
+                    break;
+                case boss1.attackType.Punch:
+
+                    if(b1b.y == 0)
+                    {
+                        b1b.y = -1;
+                        b1.FitText(ReadAscii("boss1-punch"));
+                    }
+
+                    if(b1b.y == -1)
+                    {
+                        var MainPoint = new Point(640 - b1.width, 240 - b1.height / 2);
+                        TwoPointToSpeed(b1, b1.x, b1.y, MainPoint.x, MainPoint.y);
+                        if(Distance(b1.x,b1.y, MainPoint.x, MainPoint.y) <= 10)
+                        {
+                            b1b.y = -2;
+                        }
+                    }
+
+                    if(b1b.y == -2)
+                    {
+
+                    }
+
                     break;
             }
 
