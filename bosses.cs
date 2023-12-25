@@ -25,6 +25,7 @@ namespace TeaShoot_3
                     if (Math.Sqrt(Math.Pow(b1.x - (640 - b1.width), 2) + Math.Pow(b1.y - (240 - b1.height / 2), 2)) <= 10)
                     {
                         b1b.nextAttack();
+                        b1b.kiddingInit = true;
                     }
                     double angle = Math.Atan2(b1.y - (240 - b1.height / 2), b1.x - (640 - b1.width));
 
@@ -65,7 +66,7 @@ namespace TeaShoot_3
                     if (b1b.y == 0)
                     {
                         b1.FitText(ReadAscii("boss1-kidding"));
-                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY);
+                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
                         b1b.y = -1;
                         b1b.isLeft = false;
                     }
@@ -81,20 +82,30 @@ namespace TeaShoot_3
                             }
                             if (!b1b.isLeft)
                             {
-                                b1.x += 3;
-                                if(b1.x > 640) b1b.isLeft = true;
+                                b1.x += 6;
+                                if(b1.x > 640)
+                                {
+                                    b1.y += b1.height / 2;
+                                    b1b.isLeft = true;
+                                    if (b1.y >= 480)
+                                    {
+                                        b1b.kiddingInit = true;
+                                        b1b.attackNum += 5;
+                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                    }
+                                }
                             }
                             else
                             {
-                                b1.x -= 3;
-                                if (b1.x < 0 + b1.width)
+                                b1.x -= 6;
+                                if (b1.x < -b1.width)
                                 {
-                                    b1.y += b1.height;
+                                    b1.y += b1.height / 2;
                                     b1b.isLeft = false;
-                                    if (b1.y > 480) { 
+                                    if (b1.y >= 480) { 
                                         b1b.kiddingInit = true;
                                         b1b.attackNum += 5;
-                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY);
+                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
                                     }
                                 }
                             }
@@ -136,10 +147,13 @@ namespace TeaShoot_3
                                 if (b1.x < -b1.width || b1.y < 0 - b1.height || b1.y > 480)
                                 {
                                     b1b.attackNum++;
+                                    b1b.isLeft = false;
+
+                                    Console.WriteLine(b1b.attackNum % 5 == 0);
                                     if (b1b.attackNum % 5 == 0)
                                     {
                                         b1b.kiddingInit = true;
-                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY);
+                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
                                     }
                                     else
                                     {
@@ -155,12 +169,13 @@ namespace TeaShoot_3
                                 b1.y = rnd.Next(0, (int)(480 - b1.height));
                                 b1.x = -b1.width;
                                 b1b.kiddingInit = false;
+                                b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
                             }
                             if (!b1b.isLeft)
                             {
                                 if (b1.x == -b1.width)
                                 {
-                                    var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
+                                    var fhbrfbhre = Math.Atan2(b1b.targetY - b1.y, 640 - b1.x);
                                     b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
                                     b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
                                 }
@@ -170,6 +185,7 @@ namespace TeaShoot_3
                                 {
                                     b1.x = 640;
                                     b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                    b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
                                     b1b.isLeft = true;
                                 }
                             }
@@ -177,7 +193,7 @@ namespace TeaShoot_3
                             {
                                 if (b1.x == 640)
                                 {
-                                    var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
+                                    var fhbrfbhre = Math.Atan2(b1b.targetY - b1.y, -b1.width - b1.x);
                                     b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
                                     b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
                                 }
@@ -186,16 +202,17 @@ namespace TeaShoot_3
                                 if (b1.x < -b1.width || b1.y < 0 - b1.height || b1.y > 480)
                                 {
                                     b1b.attackNum++;
+                                    b1b.isLeft = false;
                                     if (b1b.attackNum % 5 == 0)
                                     {
                                         b1b.kiddingInit = true;
-                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY);
+                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
                                     }
                                     else
                                     {
                                         b1.x = -b1.width;
                                         b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                        b1b.isLeft = false;
+                                        b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
                                     }
                                 }
                             }
@@ -208,7 +225,7 @@ namespace TeaShoot_3
                     }
 
                     b1b.shotWait++;
-                    if(b1b.shotWait >= 50)
+                    if(b1b.shotWait >= 25)
                     {
                         b1b.shotWait = 0;
                         b1b.shotY += (int)player.height;
@@ -217,13 +234,12 @@ namespace TeaShoot_3
                         if (!b1b.isLeft)
                             o14.x = -o14.width;
                         else
-                        {
-
-                        }
+                            o14.x = 640;
                         o14.y = b1b.shotY;
+                        o14.remove = RemoveType.NormalPlus;
                         var edb = Math.Atan2(player.y - o14.y, player.x - o14.x);
                         o14.speedX = (float)(Math.Cos(edb) * 3);
-                        o14.speedY = (float)(Math.Cos(edb) * 3);
+                        o14.speedY = (float)(Math.Sin(edb) * 3);
                         objList.Add(o14);
                     }
 
@@ -242,10 +258,9 @@ namespace TeaShoot_3
                     {
                         var MainPoint = new Point(640 - b1.width, 240 - b1.height / 2);
                         TwoPointToSpeed(b1, b1.x, b1.y, MainPoint.x, MainPoint.y);
-                        if(Distance(b1.x,b1.y, MainPoint.x, MainPoint.y) <= 10)
-                        {
-                            b1b.y = -2;
-                        }
+                        b1.speedX *= 2;
+                        b1.speedY *= 2;
+                        if(Distance(b1.x,b1.y, MainPoint.x, MainPoint.y) <= 10)  b1b.y = -2;
                     }
 
                     if(b1b.y == -2)
@@ -328,8 +343,15 @@ namespace TeaShoot_3
         public int x;
         public int y;
 
+        public int shotX;
+        public int shotY;
+
+        public int shotWait;
+
         public float speedX;
         public float speedY;
+
+        public float targetY;
 
         public bool isLeft;
         public bool kiddingInit;
@@ -362,6 +384,7 @@ namespace TeaShoot_3
                 else
                 {
                     attack = (attackType)((int)attack + 1);
+                    if (attack == attackType.Fishing) attack = attackType.Kidding;
                     attackNum = 0;
                     attackWait = 0;
                     x = 0;

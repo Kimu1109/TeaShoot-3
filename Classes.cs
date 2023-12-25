@@ -378,6 +378,16 @@ namespace TeaShoot_3
             }
         }
 
+        public static double Distance(double x1, double y1, double x2, double y2)
+        {
+            return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+        }
+        public static void TwoPointToSpeed(obj o, double x1, double y1, double x2, double y2)
+        {
+            var angle = Math.Atan2(y2 - y1, x2 - x1);
+            o.speedX = (float)Math.Cos(angle);
+            o.speedY = (float)Math.Sin(angle);
+        }
         public enum MoveType
         {
             Nothing = -1,
@@ -483,6 +493,16 @@ namespace TeaShoot_3
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {
             return true;
+        }
+    }
+    public class Point
+    {
+        public double x;
+        public double y;
+        public Point(double x = 0, double y = 0)
+        {
+            this.x = x;
+            this.y = y;
         }
     }
 }
