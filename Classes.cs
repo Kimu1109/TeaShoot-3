@@ -34,6 +34,8 @@ namespace TeaShoot_3
         public InitType init { get; set; }
         [Category("タイプ")]
         public int hp { get; set; }
+        [Category("ダメージ")]
+        public int damage { get; set; }
         public int maxHP;
         [Category("タイプ")]
         public int shotNum { get; set; }
@@ -175,7 +177,7 @@ namespace TeaShoot_3
                     if (IsBoss)
                     {
                         DrawBox(385, 0, 640, 20, GetColor(255,255,255), 0);
-                        DrawBox(385, 0, 385 + hp / Math.Max(1, maxHP) * 255, 20, textColor, 1);
+                        DrawBox(385, 0, 385 + (int)((float)hp / (float)Math.Max(1, maxHP) * 255), 20, textColor, 1);
                     }
                     break;
             }
@@ -467,7 +469,7 @@ namespace TeaShoot_3
                                 hp--;
                                 break;
                             case ObjType.EnemyBall:
-                                hp -= objList[touchIndex].hp;
+                                hp -= objList[touchIndex].damage;
                                 removeList.Add(objList[touchIndex]);
                                 break;
                             case ObjType.Shake:
