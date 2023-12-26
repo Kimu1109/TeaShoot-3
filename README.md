@@ -1,5 +1,5 @@
 # Teashoot-3
-![TeaShoot3-Alpha](https://github.com/Kimu1109/TeaShoot-3/assets/118643872/e0e50eef-529e-459b-ba6a-bc39103e433f)
+![TeaShoot3-Alpha](https://github.com/Kimu1109/TeaShoot-3/blob/master/%E7%84%A1%E9%A1%8C3%20(1).png?raw=true)
 
 # ビルド映像
 ![gif](https://github.com/Kimu1109/TeaShoot-3/blob/master/Animation.webp?raw=true)
