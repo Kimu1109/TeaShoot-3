@@ -410,10 +410,38 @@ namespace TeaShoot_3
                     if(b1b.y == 0)
                     {
                         b1.FitText(ReadAscii("boss1-last"));
+                        b1.type = ObjType.All;
                         b1b.y = -1;
                     }
 
+                    if (b1b.y == -1)
+                    {
+                        var MainPoint = new Point(640 - b1.width, 240 - b1.height / 2);
+                        TwoPointToSpeed(b1, b1.point, MainPoint);
+                        b1.x += b1.speedX * 2;
+                        b1.y += b1.speedY * 2;
+                        if (DistanceP(b1.point, MainPoint) <= 10) b1b.y = -2;
+                    }
 
+                    if(b1b.y == -2)
+                    {
+                        var shake = Clone(ResistIndexOf(16));
+                        shake.x = b1.x;
+                        shake.y = b1.y;
+                        shake.speedX = -2;
+                        objList.Add(shake);
+                        b1b.y = -3;
+                    }
+
+                    if(b1b.y == -3)
+                    {
+                        b1.x += 0.5f;
+                        if(b1.x > 640)
+                        {
+                            b1b.IsRemove = true;
+                            removeList.Add(b1);
+                        }
+                    }
 
                     break;
             }
@@ -503,6 +531,8 @@ namespace TeaShoot_3
         public bool isLeft;
         public bool kiddingInit;
 
+        public bool IsRemove;
+
         public enum attackType
         {
             MoveFirst = 0,
@@ -530,7 +560,6 @@ namespace TeaShoot_3
                 else
                 {
                     attack = (attackType)((int)attack + 1);
-                    if (attack == attackType.Fishing) attack = attackType.MoveLast;
                     attackNum = 0;
                     attackWait = 0;
                     x = 0;

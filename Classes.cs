@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.Devices;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Windows.Forms;
 using static DxLibDLL.DX;
 
@@ -36,7 +39,8 @@ namespace TeaShoot_3
         public int shotNum { get; set; }
         [Category("タイプ")]
         public int score { get; set; }
-
+        [Category("タイプ")]
+        public bool IsBoss { get; set; }
 
         [Category("位置")]
         public float x { get; set; }
@@ -117,6 +121,32 @@ namespace TeaShoot_3
         public static int ScrollNum;
         public static int ScrollX;
 
+        public static int BuildNum;
+        public static string LastBuild;
+
+        //FPS管理変数
+        public static int fps;
+        public static long idealSleep;
+        public static long oldTime;
+        public static long newTime;
+        public static long error;
+
+        public static long startTime;
+        public static int FpsCount;
+        public static int FPS;
+
+        public static string DevFileName;
+
+        public static long debugTime;
+        public static long debugStartTime;
+
+        public static bool IsF4;
+        public static int MouseInput;
+        public static int posX;
+        public static int posY;
+
+        public const int Boss1 = 13;
+
         public void Draw()
         {
             switch (num)
@@ -142,6 +172,11 @@ namespace TeaShoot_3
                     break;
                 default:
                     DrawString((int)x - camX, (int)y, text, textColor);
+                    if (IsBoss)
+                    {
+                        DrawBox(385, 0, 640, 20, GetColor(255,255,255), 0);
+                        DrawBox(385, 0, 385 + hp / Math.Max(1, maxHP) * 255, 20, textColor, 1);
+                    }
                     break;
             }
         }
@@ -150,11 +185,10 @@ namespace TeaShoot_3
             if (num == 0 && hp <= 0)
             {
                 residue--;
-                hp = maxHP;
-                residueFlash = hp;
+                residueFlash = maxHP;
                 if (residue < 0)
                 {
-                    MessageBox.Show("がめおゔぇｒ");
+                    MsgBox("GAME OVER");
                 }
             }
 
@@ -305,7 +339,7 @@ namespace TeaShoot_3
                 case MoveType.PlayerBall:
                     x += speedX;
                     y += speedY;
-                    if (ShakeEnabled)
+                    if (player.ShakeEnabled)
                     {
                         if (y <= 0 || y >= 480 - height)
                         {
@@ -319,6 +353,27 @@ namespace TeaShoot_3
                         }
                     }
 
+
+                    break;
+                case MoveType.Shake:
+
+                    x += speedX;
+                    y += speedY;
+
+                    speedX = Math.Min(0, speedX + 0.01f);
+                    speedY += 0.02f;
+
+                    switch (IsAllDrawingRange(true))
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            speedY *= -0.6f;
+                            break;
+                        case 2:
+                            speedY *= -0.6f;
+                            break;
+                    }
 
                     break;
             }
@@ -391,7 +446,7 @@ namespace TeaShoot_3
             switch (type)
             {
                 case ObjType.Ball:
-                    touchIndex = Touch_obj(i, new ObjType[] { ObjType.Player, ObjType.Ball });
+                    touchIndex = Touch_obj(i, new ObjType[] { ObjType.Player, ObjType.Ball, ObjType.Shake });
                     if (touchIndex != -1)
                     {
                         if (!isDevelop) removeList.Add(this);
@@ -415,11 +470,30 @@ namespace TeaShoot_3
                                 hp -= objList[touchIndex].hp;
                                 removeList.Add(objList[touchIndex]);
                                 break;
+                            case ObjType.Shake:
+                                MsgBox("シャケのパワーで、\n弾が反射するようになった!");
+                                ShakeEnabled = true;
+                                removeList.Add(objList[touchIndex]);
+                                break;
                         }
                     }
                     break;
             }
 
+        }
+        public bool RemoveEvent()
+        {
+            switch (num)
+            {
+                case 0:
+                    return false;
+                case Boss1:
+                    boss1.attack = boss1.attackType.MoveLast;
+                    return boss1.IsRemove;
+
+                default:
+                    return true;
+            }
         }
         public void FitText(string text)
         {
@@ -476,13 +550,13 @@ namespace TeaShoot_3
         public static int Touch_obj(int i, ObjType[] target)
         {
             var TObj = objList[i];
-            if (!(TObj.x > 0 + camX && TObj.x < 640 - TObj.width + camX)) return -1;
+            if (!(TObj.x >= -TObj.width + camX && TObj.x <= 640 + camX)) return -1;
             for (int z = 0; z < objList.Count; z++)
             {
                 if (z != i)
                 {
                     var CObj = objList[z];
-                    if (CObj.x > 0 + camX && CObj.x < 640 - CObj.width + camX)
+                    if (CObj.x >= -TObj.width + camX && CObj.x <= 640 + camX)
                     {
                         if (TObj.x < CObj.x + CObj.width &&
                             TObj.x + TObj.width > CObj.x &&
@@ -548,6 +622,15 @@ namespace TeaShoot_3
                 return sr.ReadToEnd();
             }
         }
+        public static uint ColorReverse(uint color)
+        {
+            int r, g, b;
+            GetColor2(color, out r, out g, out b);
+            r = 255 - r;
+            g = 255 - g;
+            b = 255 - b;
+            return GetColor(r, g, b);
+        }
 
         public static double Distance(double x1, double y1, double x2, double y2)
         {
@@ -557,6 +640,7 @@ namespace TeaShoot_3
         {
             return Math.Sqrt(Math.Pow(p1.x - p2.x, 2) + Math.Pow(p1.y - p2.y, 2));
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -565,7 +649,7 @@ namespace TeaShoot_3
         /// <param name="y1"></param>
         /// <param name="x2"></param>
         /// <param name="y2"></param>
-        /// <param name="type">0は=
+        /// <param name="type">0はそのまま
         /// 1は足し算
         /// 2は引き算
         /// </param>
@@ -627,6 +711,104 @@ namespace TeaShoot_3
                 }
             }
         }
+        public static bool IsClickRect(Rect rect)
+        {
+            if (MouseInput != 0 && posX >= rect.point1.x && posX <= rect.point2.x && posY >= rect.point1.y && posY <= rect.point2.y)
+                return true;
+            else
+                return false;
+        }
+        public static MsgBoxResult MsgBox(string Text, string Title = "TeaShoot3", MsgBoxButton button = MsgBoxButton.OK)
+        {
+            const int interval = 25;
+
+            var TextArr = Text.Replace("\r\n", "\n").Split(new[] { '\n', '\r' });
+            string newText = "";
+            foreach(var item in TextArr)
+            {
+                if(GetDrawStringWidth(item,-1) >= 340 - interval * 4)
+                {
+                    for(int i = item.Length; i > 0; i--)
+                    {
+                        if(GetDrawStringWidth(Strings.Mid(item, 1, i), -1) <= 340 - interval * 4)
+                        {
+                            newText += item.Insert(i, "\n");
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    newText += item + "\n";
+                }
+            }
+            Text = newText;
+
+            Rect OK = default;
+            Rect No = default;
+            Rect Cancel = default;
+
+            int useX = interval + 150;
+
+            if (button.HasFlag(MsgBoxButton.Cancel))
+            {
+                Cancel = new Rect(new Point(useX, 290), new Point(useX + 80, 320));
+                useX += 80 + interval;
+            }
+            if (button.HasFlag(MsgBoxButton.No)){
+                No = new Rect(new Point(useX, 290), new Point(useX + 80, 320));
+                useX += 80 + interval;
+            }
+            if (button.HasFlag(MsgBoxButton.OK))
+            {
+                OK = new Rect(new Point(useX, 290), new Point(useX + 80, 320));
+                useX += 80 + interval;
+            }
+
+            while (ProcessMessage() != -1)
+            {
+                FPS_Controller_Before();
+
+                if(OK != default)
+                {
+                    DrawBox((int)OK.point1.x, (int)OK.point1.y, (int)OK.point2.x, (int)OK.point2.y, GetColor(255, 255, 255), 0);
+                    DrawString((int)OK.point1.x + ((int)OK.point2.x - (int)OK.point1.x - GetDrawStringWidth("OK", -1)) / 2, (int)OK.point1.y + ((int)OK.point2.y - (int)OK.point1.y - GetFontSize()) / 2, "OK", GetColor(255, 255, 255));
+                    if (IsClickRect(OK)) { return MsgBoxResult.OK; }
+                }
+                if(No != default)
+                {
+                    DrawBox((int)No.point1.x, (int)No.point1.y, (int)No.point2.x, (int)No.point2.y, GetColor(255, 255, 255), 0);
+                    DrawString((int)No.point1.x + ((int)No.point2.x - (int)No.point1.x - GetDrawStringWidth("No", -1)) / 2, (int)No.point1.y + ((int)No.point2.y - (int)No.point1.y - GetFontSize()) / 2, "No", GetColor(255, 255, 255));
+                    if (IsClickRect(No)) { return MsgBoxResult.No; }
+                }
+                if (Cancel != default)
+                {
+                    DrawBox((int)Cancel.point1.x, (int)Cancel.point1.y, (int)Cancel.point2.x, (int)Cancel.point2.y, GetColor(255, 255, 255), 0);
+                    DrawString((int)Cancel.point1.x + ((int)Cancel.point2.x - (int)Cancel.point1.x - GetDrawStringWidth("Cancel", -1)) / 2, (int)Cancel.point1.y + ((int)Cancel.point2.y - (int)Cancel.point1.y - GetFontSize()) / 2, "Cancel", GetColor(255, 255, 255));
+                    if (IsClickRect(Cancel)) { return MsgBoxResult.Cancel; }
+                }
+
+                DrawBox(150, 150, 490, 330, GetColor(255, 255, 255), 0);
+                DrawBox(150, 150, 490, 150 + interval, GetColor(255, 255, 255), 1);
+                DrawString(155, 150 + (interval - GetFontSize()) / 2, Title, GetColor(0, 0, 0));
+                DrawString(150 + interval * (int)2, 150 + interval * (int)2, Text, GetColor(255, 255, 255));
+
+                FPS_Controller_After();
+            }
+            return MsgBoxResult.Cancel;
+        }
+        public enum MsgBoxResult
+        {
+            OK = 0,
+            No = 1,
+            Cancel = 2
+        }
+        public enum MsgBoxButton
+        {
+            OK = 0b0001,
+            No = 0b0010,
+            Cancel = 0b0100
+        }
         public enum MoveType
         {
             Nothing = -1,
@@ -639,7 +821,8 @@ namespace TeaShoot_3
             LittleNearAndGoAwayFromBall = 6,
             BoundSuper = 7,
             Gravity = 8,
-            PlayerBall = 9
+            PlayerBall = 9,
+            Shake = 10
         }
         //命名法則: 基本逆で書くこと,Fire=間隔が早い,Little=間隔が遅い or 効果が弱い
         public enum AttackType
@@ -677,6 +860,49 @@ namespace TeaShoot_3
             Y480_XAuto = 3,
             Y0_XAuto = 2
         }
+        /// <summary>
+        /// FPSの調整
+        /// </summary>
+        public static void FPS_Controller_After()
+        {
+            ScreenFlip();
+
+            FpsCount++;
+            if (startTime + 1000 < (long)(DateAndTime.Timer * 1000))
+            {
+                startTime = (long)(DateAndTime.Timer * 1000);
+                FPS = FpsCount;
+                FpsCount = 0;
+            }
+
+            newTime = (long)(DateAndTime.Timer * 1000);
+            long sleepTime = idealSleep - (newTime - oldTime) - error; // 休止できる時間  
+            oldTime = newTime;
+            if (sleepTime < 1) { sleepTime = 1; }
+            if (sleepTime > 10) { sleepTime = 10; }
+            if (!IsF4) WaitTimer((int)(sleepTime)); // 休止  
+            newTime = (long)(DateAndTime.Timer * 1000);
+            error = newTime - oldTime - sleepTime; // 休止時間の誤差  
+        }
+        /// <summary>
+        /// FPSの調整前の設定
+        /// </summary>
+        public static void FPS_Controller_Before()
+        {
+            if (CheckHitKey(KEY_INPUT_F4) == TRUE) IsF4 = true; else IsF4 = false;
+
+            MouseInput = GetMouseInput();
+            GetMousePoint(out posX, out posY);
+
+            oldTime = newTime;
+            debugTime = newTime;
+
+            ClearDrawScreen();
+            if ((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawString(50, 40, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)) + "\nScrollX:" + ScrollX.ToString(), GetColor(255, 255, 255));
+
+            DrawString(0, 20, "Score:" + player.score.ToString(), GetColor(255, 255, 255));
+        }
+
         public static string AppPath()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -755,6 +981,16 @@ namespace TeaShoot_3
         {
             this.x = x;
             this.y = y;
+        }
+    }
+    public class Rect
+    {
+        public Point point1;
+        public Point point2;
+        public Rect(Point point1, Point point2)
+        {
+            this.point1 = point1;
+            this.point2 = point2;
         }
     }
 }
