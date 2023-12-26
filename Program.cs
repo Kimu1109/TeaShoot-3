@@ -193,7 +193,7 @@ namespace TeaShoot_3
                         ball.x = player.x + player.width;
                         ball.y = player.y;
                         objList.Add(obj.Clone(ball));
-                        shotInterval = 5;
+                        shotInterval = 10;
                     }
                     shotInterval = Math.Max(shotInterval - 1, 0);
                 }
@@ -243,8 +243,6 @@ namespace TeaShoot_3
             ClearDrawScreen();
             if((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawString(50, 40, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)) + "\nScrollX:" + ScrollX.ToString(), GetColor(255, 255, 255));
 
-            DrawBox(0, 0, player.hp, 20, GetColor(255, 0, 0), 1);
-            DrawBox(0, 0, 255, 20, GetColor(255, 255, 255), 0);
             DrawString(0, 20, "Score:" + player.score.ToString(), GetColor(255, 255, 255));
         }
         /// <summary>
@@ -529,6 +527,7 @@ namespace TeaShoot_3
             player = op;
             objList.Clear();
             objList.Add(op);
+            mapList.Clear();
 
             int fontHeight = GetFontSize();
             using (var sr = new StreamReader(mapFile))

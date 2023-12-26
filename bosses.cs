@@ -41,23 +41,36 @@ namespace TeaShoot_3
                         b1b.y = -1;
                     }
 
-                    b1b.x++;
-                    if(b1b.x >= 100)
+                    if (b1b.y == -1)
                     {
-                        b1b.x = 0;
-                        b1b.attackNum++;
+                        var MainPoint = new Point(640 - b1.width, 240 - b1.height / 2);
+                        TwoPointToSpeed(b1, b1.point, MainPoint);
+                        b1.x += b1.speedX * 2;
+                        b1.y += b1.speedY * 2;
+                        if (DistanceP(b1.point, MainPoint) <= 10) b1b.y = -2;
+                    }
 
-                        var Rod = Clone(ResistIndexOf(15));
-                        Rod.x = rnd.Next(0, 640);
-                        Rod.y = -Rod.height;
-                        Rod.remove = RemoveType.Big;
-
-                        objList.Add(Rod);
-                        if (b1b.attackNum > 30)
+                    if(b1b.y == -2)
+                    {
+                        b1b.x++;
+                        if (b1b.x >= 50)
                         {
-                            b1b.nextAttack();
-                        }
+                            b1b.x = 0;
+                            b1b.attackNum++;
 
+                            var Rod = Clone(ResistIndexOf(15));
+                            Rod.x = rnd.Next(0, 640 - (int)Rod.width);
+                            Rod.y = -Rod.height;
+                            Rod.remove = RemoveType.Big;
+                            Rod.attack = AttackType.Boss1_Fishing_Rod;
+
+                            objList.Add(Rod);
+                            if (b1b.attackNum > 30)
+                            {
+                                b1b.nextAttack();
+                            }
+
+                        }
                     }
 
                     break;
@@ -71,155 +84,168 @@ namespace TeaShoot_3
                         b1b.isLeft = false;
                     }
 
-                    switch (b1b.kidding)
+                    if (b1b.y == -1)
                     {
-                        case boss1.kiddingType.UpToDownWithSideMove:
-                            if (b1b.kiddingInit)
-                            {
-                                b1.y = 0;
-                                b1.x = -b1.width;
-                                b1b.kiddingInit = false;
-                            }
-                            if (!b1b.isLeft)
-                            {
-                                b1.x += 6;
-                                if(b1.x > 640)
-                                {
-                                    b1.y += b1.height / 2;
-                                    b1b.isLeft = true;
-                                    if (b1.y >= 480)
-                                    {
-                                        b1b.kiddingInit = true;
-                                        b1b.attackNum += 5;
-                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                b1.x -= 6;
-                                if (b1.x < -b1.width)
-                                {
-                                    b1.y += b1.height / 2;
-                                    b1b.isLeft = false;
-                                    if (b1.y >= 480) { 
-                                        b1b.kiddingInit = true;
-                                        b1b.attackNum += 5;
-                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
-                                    }
-                                }
-                            }
-                            break;
-                        case boss1.kiddingType.MoveToPlayer:
-                            if (b1b.kiddingInit)
-                            {
-                                b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                b1.x = -b1.width;
-                                b1b.kiddingInit = false;
-                            }
-                            if (!b1b.isLeft)
-                            {
-                                if(b1.x == -b1.width)
-                                {
-                                    var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
-                                    b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
-                                    b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
-                                }
-                                b1.x += b1b.speedX;
-                                b1.y += b1b.speedY;
-                                if(b1.x > 640 || b1.y < 0 - b1.height || b1.y > 480)
-                                {
-                                    b1.x = 640;
-                                    b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                    b1b.isLeft = true;
-                                }
-                            }
-                            else
-                            {
-                                if (b1.x == 640)
-                                {
-                                    var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
-                                    b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
-                                    b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
-                                }
-                                b1.x += b1b.speedX;
-                                b1.y += b1b.speedY;
-                                if (b1.x < -b1.width || b1.y < 0 - b1.height || b1.y > 480)
-                                {
-                                    b1b.attackNum++;
-                                    b1b.isLeft = false;
-
-                                    Console.WriteLine(b1b.attackNum % 5 == 0);
-                                    if (b1b.attackNum % 5 == 0)
-                                    {
-                                        b1b.kiddingInit = true;
-                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
-                                    }
-                                    else
-                                    {
-                                        b1.x = -b1.width;
-                                        b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                    }
-                                }
-                            }
-                            break;
-                        case boss1.kiddingType.RandomY:
-                            if (b1b.kiddingInit)
-                            {
-                                b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                b1.x = -b1.width;
-                                b1b.kiddingInit = false;
-                                b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
-                            }
-                            if (!b1b.isLeft)
-                            {
-                                if (b1.x == -b1.width)
-                                {
-                                    var fhbrfbhre = Math.Atan2(b1b.targetY - b1.y, 640 - b1.x);
-                                    b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
-                                    b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
-                                }
-                                b1.x += b1b.speedX;
-                                b1.y += b1b.speedY;
-                                if (b1.x > 640 || b1.y < 0 - b1.height || b1.y > 480)
-                                {
-                                    b1.x = 640;
-                                    b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                    b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
-                                    b1b.isLeft = true;
-                                }
-                            }
-                            else
-                            {
-                                if (b1.x == 640)
-                                {
-                                    var fhbrfbhre = Math.Atan2(b1b.targetY - b1.y, -b1.width - b1.x);
-                                    b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
-                                    b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
-                                }
-                                b1.x += b1b.speedX;
-                                b1.y += b1b.speedY;
-                                if (b1.x < -b1.width || b1.y < 0 - b1.height || b1.y > 480)
-                                {
-                                    b1b.attackNum++;
-                                    b1b.isLeft = false;
-                                    if (b1b.attackNum % 5 == 0)
-                                    {
-                                        b1b.kiddingInit = true;
-                                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
-                                    }
-                                    else
-                                    {
-                                        b1.x = -b1.width;
-                                        b1.y = rnd.Next(0, (int)(480 - b1.height));
-                                        b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
-                                    }
-                                }
-                            }
-                            break;
+                        var MainPoint = new Point(640, 240 - b1.height / 2);
+                        TwoPointToSpeed(b1, b1.point, MainPoint);
+                        b1.x += b1.speedX * 2;
+                        b1.y += b1.speedY * 2;
+                        if (DistanceP(b1.point, MainPoint) <= 10) b1b.y = -2;
                     }
 
-                    if(b1b.attackNum >= 30)
+                    if (b1b.y == -2)
+                    {
+                        switch (b1b.kidding)
+                        {
+                            case boss1.kiddingType.UpToDownWithSideMove:
+                                if (b1b.kiddingInit)
+                                {
+                                    b1.y = 0;
+                                    b1.x = -b1.width;
+                                    b1b.kiddingInit = false;
+                                }
+                                if (!b1b.isLeft)
+                                {
+                                    b1.x += 6;
+                                    if (b1.x > 640)
+                                    {
+                                        b1.y += b1.height / 2;
+                                        b1b.isLeft = true;
+                                        if (b1.y >= 480)
+                                        {
+                                            b1b.kiddingInit = true;
+                                            b1b.attackNum += 5;
+                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    b1.x -= 6;
+                                    if (b1.x < -b1.width)
+                                    {
+                                        b1.y += b1.height / 2;
+                                        b1b.isLeft = false;
+                                        if (b1.y >= 480)
+                                        {
+                                            b1b.kiddingInit = true;
+                                            b1b.attackNum += 5;
+                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                        }
+                                    }
+                                }
+                                break;
+                            case boss1.kiddingType.MoveToPlayer:
+                                if (b1b.kiddingInit)
+                                {
+                                    b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                    b1.x = -b1.width;
+                                    b1b.kiddingInit = false;
+                                }
+                                if (!b1b.isLeft)
+                                {
+                                    if (b1.x == -b1.width)
+                                    {
+                                        var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
+                                        b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
+                                        b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
+                                    }
+                                    b1.x += b1b.speedX;
+                                    b1.y += b1b.speedY;
+                                    if (b1.x > 640 || b1.y < 0 - b1.height || b1.y > 480)
+                                    {
+                                        b1.x = 640;
+                                        b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                        b1b.isLeft = true;
+                                    }
+                                }
+                                else
+                                {
+                                    if (b1.x == 640)
+                                    {
+                                        var fhbrfbhre = Math.Atan2(player.y - b1.y, player.x - b1.x);
+                                        b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
+                                        b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
+                                    }
+                                    b1.x += b1b.speedX;
+                                    b1.y += b1b.speedY;
+                                    if (b1.x < -b1.width || b1.y < 0 - b1.height || b1.y > 480)
+                                    {
+                                        b1b.attackNum++;
+                                        b1b.isLeft = false;
+
+                                        Console.WriteLine(b1b.attackNum % 5 == 0);
+                                        if (b1b.attackNum % 5 == 0)
+                                        {
+                                            b1b.kiddingInit = true;
+                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                        }
+                                        else
+                                        {
+                                            b1.x = -b1.width;
+                                            b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                        }
+                                    }
+                                }
+                                break;
+                            case boss1.kiddingType.RandomY:
+                                if (b1b.kiddingInit)
+                                {
+                                    b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                    b1.x = -b1.width;
+                                    b1b.kiddingInit = false;
+                                    b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
+                                }
+                                if (!b1b.isLeft)
+                                {
+                                    if (b1.x == -b1.width)
+                                    {
+                                        var fhbrfbhre = Math.Atan2(b1b.targetY - b1.y, 640 - b1.x);
+                                        b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
+                                        b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
+                                    }
+                                    b1.x += b1b.speedX;
+                                    b1.y += b1b.speedY;
+                                    if (b1.x > 640 || b1.y < 0 - b1.height || b1.y > 480)
+                                    {
+                                        b1.x = 640;
+                                        b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                        b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
+                                        b1b.isLeft = true;
+                                    }
+                                }
+                                else
+                                {
+                                    if (b1.x == 640)
+                                    {
+                                        var fhbrfbhre = Math.Atan2(b1b.targetY - b1.y, -b1.width - b1.x);
+                                        b1b.speedX = (float)Math.Cos(fhbrfbhre) * 5;
+                                        b1b.speedY = (float)Math.Sin(fhbrfbhre) * 5;
+                                    }
+                                    b1.x += b1b.speedX;
+                                    b1.y += b1b.speedY;
+                                    if (b1.x < -b1.width || b1.y < 0 - b1.height || b1.y > 480)
+                                    {
+                                        b1b.attackNum++;
+                                        b1b.isLeft = false;
+                                        if (b1b.attackNum % 5 == 0)
+                                        {
+                                            b1b.kiddingInit = true;
+                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                        }
+                                        else
+                                        {
+                                            b1.x = -b1.width;
+                                            b1.y = rnd.Next(0, (int)(480 - b1.height));
+                                            b1b.targetY = rnd.Next(0, (int)(480 - b1.height));
+                                        }
+                                    }
+                                }
+                                break;
+                        }
+                    }
+
+                    if (b1b.attackNum >= 15)
                     {
                         b1b.nextAttack();
                     }
@@ -259,7 +285,6 @@ namespace TeaShoot_3
                         b1.x += b1.speedX * 2;
                         b1.y += b1.speedY * 2;
                         if(DistanceP(b1.point, MainPoint) <= 10)  b1b.y = -2;
-                        Console.WriteLine(DistanceP(b1.point, MainPoint));
                     }
 
                     if(b1b.y == -2)
@@ -277,13 +302,11 @@ namespace TeaShoot_3
                             b1b.x += (int)player.height;
                             if(b1b.x >= 480) { b1b.x = 0; }
                         }
-                        if(b1b.attackNum > 200)
+                        if(b1b.attackNum > 100)
                         {
                             b1b.nextAttack();
                         }
                     }
-
-                    SetWindowText(b1b.y.ToString());
 
                     break;
                 case boss1.attackType.BoundFish:
@@ -291,7 +314,7 @@ namespace TeaShoot_3
                     if (b1b.y == 0)
                     {
                         b1b.y = -1;
-                        b1.FitText(ReadAscii("boss1-punch"));
+                        b1.FitText(ReadAscii("boss1-bound"));
                     }
 
                     if (b1b.y == -1)
@@ -301,13 +324,12 @@ namespace TeaShoot_3
                         b1.x += b1.speedX * 2;
                         b1.y += b1.speedY * 2;
                         if (DistanceP(b1.point, MainPoint) <= 10) b1b.y = -2;
-                        Console.WriteLine(DistanceP(b1.point, MainPoint));
                     }
 
                     if (b1b.y == -2)
                     {
                         b1b.attackWait++;
-                        if (b1b.attackWait >= 20)
+                        if (b1b.attackWait >= 40)
                         {
                             b1b.attackWait = 0;
                             var o14 = Clone(ResistIndexOf(14));
@@ -316,12 +338,15 @@ namespace TeaShoot_3
                             o14.y = b1b.x;
                             o14.speedX = -3;
                             o14.SuperBoundNum = 5;
+                            o14.FitText(ReadAscii("boss1-fish"));
+                            o14.RemoveBoundCountMax = 20;
+                            o14.hp = 8;
                             objList.Add(o14);
                             b1b.attackNum++;
                             b1b.x += (int)player.height;
                             if (b1b.x >= 480) { b1b.x = 0; }
                         }
-                        if (b1b.attackNum > 200)
+                        if (b1b.attackNum > 100)
                         {
                             b1b.nextAttack();
                         }
@@ -330,9 +355,64 @@ namespace TeaShoot_3
                     break;
                 case boss1.attackType.PunchPlus:
 
+                    if (b1b.y == 0)
+                    {
+                        b1b.y = -1;
+                        b1.FitText(ReadAscii("boss1-punchplus"));
+                    }
+
+                    if (b1b.y == -1)
+                    {
+                        var MainPoint = new Point(640 - b1.width, 240 - b1.height / 2);
+                        TwoPointToSpeed(b1, b1.point, MainPoint);
+                        b1.x += b1.speedX * 2;
+                        b1.y += b1.speedY * 2;
+                        if (DistanceP(b1.point, MainPoint) <= 10) b1b.y = -2;
+                    }
+
+                    if (b1b.y == -2)
+                    {
+                        b1b.attackWait++;
+                        if (b1b.attackWait >= 80)
+                        {
+                            b1b.attackWait = 0;
+                            var o14 = Clone(ResistIndexOf(14));
+                            o14.move = MoveType.LittleNearAndGoAwayFromBall;
+                            o14.x = 640;
+                            o14.y = b1b.x;
+                            objList.Add(o14);
+
+                            b1b.attackWait = 0;
+                            var o142 = Clone(ResistIndexOf(14));
+                            o142.move = MoveType.BoundSuper;
+                            o142.x = 640;
+                            o142.y = b1b.x;
+                            o142.speedX = -3;
+                            o142.SuperBoundNum = 5;
+                            o142.FitText(ReadAscii("boss1-fish"));
+                            o142.RemoveBoundCountMax = 20;
+                            o142.hp = 8;
+                            objList.Add(o142);
+
+                            b1b.attackNum++;
+                            b1b.x += (int)player.height;
+                            if (b1b.x >= 480) { b1b.x = 0; }
+                        }
+                        if (b1b.attackNum > 75)
+                        {
+                            b1b.nextAttack();
+                        }
+                    }
 
                     break;
                 case boss1.attackType.MoveLast:
+
+                    if(b1b.y == 0)
+                    {
+                        b1.FitText(ReadAscii("boss1-last"));
+                        b1b.y = -1;
+                    }
+
 
 
                     break;
@@ -450,7 +530,7 @@ namespace TeaShoot_3
                 else
                 {
                     attack = (attackType)((int)attack + 1);
-                    if (attack == attackType.Fishing) attack = attackType.BoundFish;
+                    if (attack == attackType.Fishing) attack = attackType.MoveLast;
                     attackNum = 0;
                     attackWait = 0;
                     x = 0;

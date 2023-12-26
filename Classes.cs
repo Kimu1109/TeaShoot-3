@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
+using System.Windows.Forms;
 using static DxLibDLL.DX;
 
 namespace TeaShoot_3
@@ -30,6 +31,7 @@ namespace TeaShoot_3
         public InitType init { get; set; }
         [Category("タイプ")]
         public int hp { get; set; }
+        public int maxHP;
         [Category("タイプ")]
         public int shotNum { get; set; }
         [Category("タイプ")]
@@ -88,8 +90,16 @@ namespace TeaShoot_3
 
         public bool isInit;
 
+        [Category("プレイヤー")]
+        public int residue { get; set; }
+        public int residueFlash;
+
         public boss2 boss2;
         public boss1 boss1;
+
+        //Shakeはボールがバウンドする
+        [Category("プレイヤー")]
+        public bool ShakeEnabled { get; set; }
 
         //共通変数　及び　環境変数
         public static int camX;
@@ -107,17 +117,52 @@ namespace TeaShoot_3
         public static int ScrollNum;
         public static int ScrollX;
 
-
         public void Draw()
         {
-            DrawString((int)x - camX, (int)y, text, textColor);
+            switch (num)
+            {
+                case 0:
+                    if (residueFlash == 0 || residueFlash % 2 == 0)
+                    {
+                        DrawString((int)x - camX, (int)y, text, textColor);
+                        DrawBox(0, 0, player.hp, 20, textColor, 1);
+                    } else {
+                        DrawString((int)x - camX, (int)y, text, GetColor(0, 0, 0));
+                        DrawBox(0, 0, player.hp, 20, GetColor(0, 0, 0), 1);
+                    }
+                    residueFlash = Math.Max(0, residueFlash - 1);
+                    if (residueFlash != 0) hp = 255 - residueFlash;
+                    DrawBox(0, 0, 255, 20, GetColor(255, 255, 255), 0);
+                    break;
+                case 1:
+                    if (player.residueFlash == 0 || player.residueFlash % 2 == 0)
+                        DrawString((int)x - camX, (int)y, text, textColor);
+                    else
+                        DrawString((int)x - camX, (int)y, text, GetColor(0, 0, 0));
+                    break;
+                default:
+                    DrawString((int)x - camX, (int)y, text, textColor);
+                    break;
+            }
         }
         public void Process(int i)
         {
+            if (num == 0 && hp <= 0)
+            {
+                residue--;
+                hp = maxHP;
+                residueFlash = hp;
+                if (residue < 0)
+                {
+                    MessageBox.Show("がめおゔぇｒ");
+                }
+            }
+
             if (!isInit)
             {
                 isInit = true;
                 IsBound = true;
+                maxHP = hp;
                 switch (init)
                 {
                     case InitType.Nothing:
@@ -231,6 +276,8 @@ namespace TeaShoot_3
                                     speedY *= 2;
                                     SuperBoundCount = 0;
                                 }
+                                RemoveBoundCount++;
+                                if ((RemoveBoundCountMax != -1) && (RemoveBoundCountMax <= RemoveBoundCount)) move = MoveType.Speed;
                                 break;
                             case 2:
                                 speedX *= -0.8f;
@@ -240,13 +287,39 @@ namespace TeaShoot_3
                                     speedX *= 2;
                                     SuperBoundCount = 0;
                                 }
+                                RemoveBoundCount++;
+                                if ((RemoveBoundCountMax != -1) && (RemoveBoundCountMax <= RemoveBoundCount)) move = MoveType.Speed;
                                 break;
                         }
                     }
 
                     x += speedX;
                     y += speedY;
-                    
+
+                    break;
+                case MoveType.Gravity:
+                    x += speedX;
+                    y += speedY;
+                    speedY += 0.03f;
+                    break;
+                case MoveType.PlayerBall:
+                    x += speedX;
+                    y += speedY;
+                    if (ShakeEnabled)
+                    {
+                        if (y <= 0 || y >= 480 - height)
+                        {
+                            speedY *= -1;
+                            move = MoveType.Speed;
+                        }
+                        if (x <= 0 || x >= 640 - width)
+                        {
+                            speedX *= -1;
+                            move = MoveType.Speed;
+                        }
+                    }
+
+
                     break;
             }
             switch (attack)
@@ -265,6 +338,40 @@ namespace TeaShoot_3
                     break;
                 case AttackType.Boss1:
                     bosses.ProcessBoss1(i);
+                    break;
+                case AttackType.Boss1_Fishing_Rod:
+                    if (y <= 0)
+                    {
+                        y++;
+                    }
+                    else if (shotInterval != -1)
+                    {
+                        shotInterval++;
+                        if (shotInterval == 150)
+                        {
+                            var o14 = Clone(ResistIndexOf(14));
+                            o14.x = x;
+                            o14.y = 480;
+                            o14.FitText(ReadAscii("boss1-fish"));
+                            o14.speedY = -5;
+                            o14.hp = 1000;
+                            o14.move = MoveType.Gravity;
+                            o14.remove = RemoveType.Big;
+                            o14.type = ObjType.Enemy;
+                            objList.Add(o14);
+                        }
+                        foreach (var o in objList)
+                        {
+                            if (o.num == 14 && o.move == MoveType.Gravity && o.x == x && o.y <= height)
+                            {
+                                o.move = MoveType.Speed;
+                                o.speedY = -1;
+                                shotInterval = -1;
+                                break;
+                            }
+                        }
+                    }
+                    if (shotInterval == -1) y -= 2;
                     break;
             }
 
@@ -492,7 +599,7 @@ namespace TeaShoot_3
         /// <returns></returns>
         public int IsAllDrawingRange(bool IsFit = false)
         {
-            if(x >= 0 && x <= 640 - width && y >= 0 && y <= 480 - height)
+            if (x >= 0 && x <= 640 - width && y >= 0 && y <= 480 - height)
                 return 0;
             else
             {
@@ -530,7 +637,9 @@ namespace TeaShoot_3
             Bound = 4,
             BoundX0 = 5,
             LittleNearAndGoAwayFromBall = 6,
-            BoundSuper = 7
+            BoundSuper = 7,
+            Gravity = 8,
+            PlayerBall = 9
         }
         //命名法則: 基本逆で書くこと,Fire=間隔が早い,Little=間隔が遅い or 効果が弱い
         public enum AttackType
@@ -557,7 +666,8 @@ namespace TeaShoot_3
             Player = 0,
             Ball = 1,
             Enemy = 10,
-            EnemyBall = 11
+            EnemyBall = 11,
+            Shake = 12
         }
         public enum InitType
         {
