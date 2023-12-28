@@ -5,7 +5,6 @@ using System.Text;
 using Microsoft.VisualBasic;
 using System.Windows.Forms;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using static DxLibDLL.DX;
 using static TeaShoot_3.obj;
 
@@ -13,17 +12,6 @@ namespace TeaShoot_3
 {
     public static class Program
     {
-
-        //FPS管理変数
-        static int fps;
-        static long idealSleep;
-        static long oldTime;
-        static long newTime;
-        static long error;
-
-        static long startTime;
-        static int FpsCount;
-        static int FPS;
 
         //メイン変数
         public static List<obj> selectList;
@@ -58,16 +46,6 @@ namespace TeaShoot_3
         static bool isA;
         static bool isS;
         static bool isD;
-
-        static int BuildNum;
-        static string LastBuild;
-
-        public static string DevFileName;
-
-        static long debugTime;
-        static long debugStartTime;
-
-        static bool IsF4;
 
         [STAThread]
         public static void Main()
@@ -140,7 +118,7 @@ namespace TeaShoot_3
                 //自動消去
                 foreach (var o in removeList)
                 {
-                    if(o != null && o.num != 0) objList.Remove(o);
+                    if(o != null && o.RemoveEvent()) objList.Remove(o);
                 }
                 removeList.Clear();
                 if (!isDevelop) {
@@ -193,7 +171,7 @@ namespace TeaShoot_3
                         ball.x = player.x + player.width;
                         ball.y = player.y;
                         objList.Add(obj.Clone(ball));
-                        shotInterval = 5;
+                        shotInterval = 10;
                     }
                     shotInterval = Math.Max(shotInterval - 1, 0);
                 }
@@ -205,46 +183,6 @@ namespace TeaShoot_3
             WaitTimer(2000);
             DxLib_End();
 
-        }
-        /// <summary>
-        /// FPSの調整
-        /// </summary>
-        private static void FPS_Controller_After()
-        {
-            ScreenFlip();
-
-            FpsCount++;
-            if (startTime + 1000 < (long)(DateAndTime.Timer * 1000))
-            {
-                startTime = (long)(DateAndTime.Timer * 1000);
-                FPS = FpsCount;
-                FpsCount = 0;
-            }
-
-            newTime = (long)(DateAndTime.Timer * 1000);
-            long sleepTime = idealSleep - (newTime - oldTime) - error; // 休止できる時間  
-            oldTime = newTime;
-            if(sleepTime < 1) { sleepTime = 1; }
-            if (sleepTime > 10) { sleepTime = 10; }
-            if(!IsF4) WaitTimer((int)(sleepTime)); // 休止  
-            newTime = (long)(DateAndTime.Timer * 1000);
-            error = newTime - oldTime - sleepTime; // 休止時間の誤差  
-        }
-        /// <summary>
-        /// FPSの調整前の設定
-        /// </summary>
-        private static void FPS_Controller_Before()
-        {
-            if (CheckHitKey(KEY_INPUT_F4) == TRUE) IsF4 = true; else IsF4 = false; 
-
-            oldTime = newTime;
-            debugTime = newTime;
-
-            ClearDrawScreen();
-            if((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawString(50, 20, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)) + "\nScrollX:" + ScrollX.ToString(), GetColor(255, 255, 255));
-
-            DrawBox(0, 0, player.hp, 20, GetColor(255, 0, 0), 1);
-            DrawBox(0, 0, 255, 20, GetColor(255, 255, 255), 0);
         }
         /// <summary>
         /// 開発モード
@@ -528,6 +466,7 @@ namespace TeaShoot_3
             player = op;
             objList.Clear();
             objList.Add(op);
+            mapList.Clear();
 
             int fontHeight = GetFontSize();
             using (var sr = new StreamReader(mapFile))

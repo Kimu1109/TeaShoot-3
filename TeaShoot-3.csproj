@@ -8,10 +8,11 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>TeaShoot_3</RootNamespace>
     <AssemblyName>TeaShoot-3</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +36,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>cat with tea zoom.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
@@ -55,6 +59,7 @@
     <Compile Include="bosses.cs" />
     <Compile Include="Classes.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +72,9 @@
     <Compile Include="TextDialog.Designer.cs">
       <DependentUpon>TextDialog.cs</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="cat with tea zoom.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PropertyScreen.resx">

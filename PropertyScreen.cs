@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static TeaShoot_3.Program;
 using static TeaShoot_3.obj;
 using static DxLibDLL.DX;
 using Microsoft.VisualBasic;
@@ -107,7 +106,7 @@ namespace TeaShoot_3
 
         private void propertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            registerToolStripMenuItem_Click();
         }
 
         public void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -147,7 +146,7 @@ namespace TeaShoot_3
 
         public void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using(var sw = new StreamWriter(obj.AppPath() + @"\map\map1.dat"))
+            using(var sw = new StreamWriter(obj.AppPath() + @"\map\" + DevFileName))
             {
                 var writeList = new List<int[]>();
                 int nowSpace = 0;
@@ -192,7 +191,7 @@ namespace TeaShoot_3
                     sw.WriteLine(writeStr);
                 }
             }
-            MessageBox.Show("finished writing map1.dat.");
+            MessageBox.Show("finished writing " + DevFileName);
         }
 
         public void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -208,7 +207,7 @@ namespace TeaShoot_3
 
         private void 保存ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            保存ToolStripMenuItem_Click();
         }
 
         private void devFileNameToolStripMenuItem_Click(object sender, EventArgs e)
@@ -236,6 +235,26 @@ namespace TeaShoot_3
         {
             if (listView1.SelectedIndices.Count == 0) return;
             resistList[listView1.SelectedIndices[0]].FitText(resistList[listView1.SelectedIndices[0]].text);
+        }
+
+        private void registerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            propertyToolStripMenuItem_Click();
+        }
+
+        private void 追加ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            追加ToolStripMenuItem_Click();
+        }
+
+        private void 削除ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void 再読み込みToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            再読み込みToolStripMenuItem_Click();
         }
     }
 }
