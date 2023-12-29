@@ -85,119 +85,16 @@ namespace TeaShoot_3
         public int SuperBoundCount;
         public bool IsBound;
 
-        public int RemoveBoundCount;
+            var b1b = b1.boss1;
 
-        public uint textColor;
-        public int shotInterval;
 
-        public bool isInit;
 
-        [Category("プレイヤー")]
-        public int residue { get; set; }
-        public int residueFlash;
-        public int residueWait;
-
-        public boss2 boss2;
-        public boss1 boss1;
-
-        //Shakeはボールがバウンドする
-        [Category("プレイヤー")]
-        public bool ShakeEnabled { get; set; }
-
-        //共通変数　及び　環境変数
-        public static int camX;
-        public static obj player;
-        public static Random rnd = new Random();
-
-        public static List<obj> objList;
-        public static List<obj> removeList;
-        public static List<obj> resistList;
-
-        public static bool isDevelop;
-
-        public static int autoX;
-        public static bool IsScroll;
-        public static int ScrollNum;
-        public static int ScrollX;
-
-        public static int BuildNum;
-        public static string LastBuild;
-
-        //FPS管理変数
-        public static int fps;
-        public static long idealSleep;
-        public static long oldTime;
-        public static long newTime;
-        public static long error;
-
-        public static long startTime;
-        public static int FpsCount;
-        public static int FPS;
-
-        public static string DevFileName;
-
-        public static long debugTime;
-        public static long debugStartTime;
-
-        public static bool IsF4;
-        public static int MouseInput;
-        public static int posX;
-        public static int posY;
-
-        public static PropertyScreen ps;
-        public static int MiniFont;
-
-        public const int Boss1 = 13;
-
-        public void Draw()
-        {
-            switch (num)
-            {
-                case 0:
-                    if (residueFlash == 0 || residueFlash % 2 == 0)
-                    {
-                        DrawString((int)x - camX, (int)y, text, textColor);
-                        DrawBox(0, 0, player.hp, 20, textColor, 1);
-                    }
-                    else
-                    {
-                        DrawString((int)x - camX, (int)y, text, GetColor(0, 0, 0));
-                        DrawBox(0, 0, player.hp, 20, GetColor(0, 0, 0), 1);
-                    }
-                    residueFlash = Math.Max(0, residueFlash - 1);
-                    if (residueFlash != 0) hp = 255 - residueFlash;
-                    DrawBox(0, 0, 255, 20, GetColor(255, 255, 255), 0);
-                    break;
-                case 1:
-                    if (player.residueFlash == 0 || player.residueFlash % 2 == 0)
-                        DrawString((int)x - camX, (int)y, text, textColor);
-                    else
-                        DrawString((int)x - camX, (int)y, text, GetColor(0, 0, 0));
-                    break;
-                default:
-                    if (residueFlash == 0 || residueFlash % 70 >= 35)
-                        DrawString((int)x - camX, (int)y, text, textColor);
-                    residueFlash = Math.Max(0, residueFlash - 1);
-
-                    if (IsBoss)
-                    {
-                        DrawBox(385, 0, 640, 20, GetColor(255, 255, 255), 0);
-                        DrawBox(385, 0, 385 + (int)((float)hp / (float)Math.Max(1, maxHP) * 255), 20, textColor, 1);
-                    }
-                    break;
-            }
         }
-        public void Process(int i)
+        public static void ProcessBoss2(int i)
         {
-            if (num == 0 && hp <= 0)
-            {
-                residue--;
-                residueFlash = maxHP;
-                if (residue < 0)
-                {
-                    MsgBox("GAME OVER");
-                }
-            }
+            var b2 = objList[i];
+
+            var b2b = b2.boss2;
 
             if (!isInit)
             {
@@ -884,30 +781,10 @@ namespace TeaShoot_3
                 FpsCount = 0;
             }
 
-            newTime = (long)(DateAndTime.Timer * 1000);
-            long sleepTime = idealSleep - (newTime - oldTime) - error; // 休止できる時間  
-            oldTime = newTime;
-            if (sleepTime < 1) { sleepTime = 1; }
-            if (sleepTime > 10) { sleepTime = 10; }
-            if (!IsF4) WaitTimer((int)(sleepTime)); // 休止  
-            newTime = (long)(DateAndTime.Timer * 1000);
-            error = newTime - oldTime - sleepTime; // 休止時間の誤差  
-        }
-        /// <summary>
-        /// FPSの調整前の設定
-        /// </summary>
-        public static void FPS_Controller_Before()
-        {
-            if (CheckHitKey(KEY_INPUT_F4) == TRUE) IsF4 = true; else IsF4 = false;
-
-            MouseInput = GetMouseInput();
-            GetMousePoint(out posX, out posY);
-
-            oldTime = newTime;
-            debugTime = newTime;
-
-            ClearDrawScreen();
-            if ((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawStringToHandle(50, 60, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)) + "\nScrollX:" + ScrollX.ToString(), GetColor(255, 255, 255), MiniFont);
+    }
+    [Serializable]
+    public class boss1
+    {
 
             DrawString(0, 20, "Score:" + player.score.ToString() + "\n" + "Residue:" + player.residue.ToString(), GetColor(255, 255, 255));
         }
