@@ -514,19 +514,19 @@ namespace TeaShoot_3
                 stream.Position = 0;
 
                 return (obj)formatter.Deserialize(stream);
-                    }
-                        }
+            }
+        }
         public static void WriteObj(obj obj, string path)
-                            {
+        {
             if (obj == null) return;
             obj.boss2 = new boss2();
             obj.boss1 = new boss1();
             using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
-                                {
+            {
                 var formatter = new BinaryFormatter();
                 formatter.Serialize(stream, obj);
-                        }
-                    }
+            }
+        }
 
         public obj(int num, ObjType type, bool IsFitSize = true, float width = 0, float height = 0, string text = "")
         {
@@ -759,7 +759,8 @@ namespace TeaShoot_3
                 Cancel = new Rect(new Point(useX, 290), new Point(useX + 80, 320));
                 useX += 80 + interval;
             }
-            if (button.HasFlag(MsgBoxButton.No)){
+            if (button.HasFlag(MsgBoxButton.No))
+            {
                 No = new Rect(new Point(useX, 290), new Point(useX + 80, 320));
                 useX += 80 + interval;
             }
@@ -773,13 +774,13 @@ namespace TeaShoot_3
             {
                 FPS_Controller_Before();
 
-                if(OK != default)
+                if (OK != default)
                 {
                     DrawBox((int)OK.point1.x, (int)OK.point1.y, (int)OK.point2.x, (int)OK.point2.y, GetColor(255, 255, 255), 0);
                     DrawString((int)OK.point1.x + ((int)OK.point2.x - (int)OK.point1.x - GetDrawStringWidth("OK", -1)) / 2, (int)OK.point1.y + ((int)OK.point2.y - (int)OK.point1.y - GetFontSize()) / 2, "OK", GetColor(255, 255, 255));
                     if (IsClickRect(OK)) { return MsgBoxResult.OK; }
                 }
-                if(No != default)
+                if (No != default)
                 {
                     DrawBox((int)No.point1.x, (int)No.point1.y, (int)No.point2.x, (int)No.point2.y, GetColor(255, 255, 255), 0);
                     DrawString((int)No.point1.x + ((int)No.point2.x - (int)No.point1.x - GetDrawStringWidth("No", -1)) / 2, (int)No.point1.y + ((int)No.point2.y - (int)No.point1.y - GetFontSize()) / 2, "No", GetColor(255, 255, 255));
@@ -828,7 +829,8 @@ namespace TeaShoot_3
             PlayerBall = 9,
             Shake = 10
         }
-        public enum kiddingType
+        //命名法則: 基本逆で書くこと,Fire=間隔が早い,Little=間隔が遅い or 効果が弱い
+        public enum AttackType
         {
             Nothing = 0,
             Normal = 1,
@@ -910,6 +912,14 @@ namespace TeaShoot_3
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
+        public static string SecondToTime(int s)
+        {
+            string r = "";
+            int hour = s / 60 / 60;
+            s -= hour * 60 * 60;
+            int minute = s / 60;
+            s -= minute * 60;
+            int second = s;
 
             if (hour != 0) { r += hour.ToString() + "時"; }
             if (minute != 0) { r += minute.ToString() + "分"; }

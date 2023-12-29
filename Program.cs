@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.VisualBasic;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using static DxLibDLL.DX;
 using static TeaShoot_3.obj;
 
@@ -51,7 +52,7 @@ namespace TeaShoot_3
         public static void Main()
         {
             //ビルドの取得及び出力
-            using(var sr = new StreamReader(AppPath() + @"\output.log"))
+            using (var sr = new StreamReader(AppPath() + @"\output.log"))
             {
                 BuildNum = Convert.ToInt32(sr.ReadLine()) + 1;
             }
@@ -90,7 +91,7 @@ namespace TeaShoot_3
             //登録オブジェクトの読み込み及び設定。
             ReloadResist();
 
-            foreach(var o in resistList)
+            foreach (var o in resistList)
             {
                 o.FitText(o.text);
                 obj.WriteObj(o, obj.AppPath() + @"\resist\" + o.num.ToString() + ".dat");
@@ -99,7 +100,7 @@ namespace TeaShoot_3
             objList.Add(ResistIndexOf(0));
             player = objList[0];
             ball = ResistIndexOf(1);
-            player.y = 240 - player.height / 2; 
+            player.y = 240 - player.height / 2;
 
             newTime = (long)(DateAndTime.Timer * 1000);
 
@@ -111,17 +112,19 @@ namespace TeaShoot_3
                 for (int i = 0; i < objList.Count; i++)
                 {
                     objList[i].Draw();
-                    if (!isDevelop) { 
+                    if (!isDevelop)
+                    {
                         objList[i].Process(i);
                     }
                 }
                 //自動消去
                 foreach (var o in removeList)
                 {
-                    if(o != null && o.RemoveEvent()) objList.Remove(o);
+                    if (o != null && o.RemoveEvent()) objList.Remove(o);
                 }
                 removeList.Clear();
-                if (!isDevelop) {
+                if (!isDevelop)
+                {
                     //スクロール
                     ScrollNum++;
                     if (ScrollNum > 50)
@@ -191,7 +194,7 @@ namespace TeaShoot_3
         {
             if (isDevelop)
             {
-                for(int x = 0; x < 640; x++)
+                for (int x = 0; x < 640; x++)
                 {
                     DrawString(x * 50 - camX % 50, 0, ((camX - camX % 50 + x * 50) / 50).ToString(), GetColor(64, 64, 64));
                     DrawLine(x * 50 - camX % 50, 0, x * 50 - camX % 50, 480, GetColor(64, 64, 64));
@@ -199,22 +202,22 @@ namespace TeaShoot_3
                 for (int y = 0; y < 480 / player.height; y++)
                 {
                     DrawLine(0, y * (int)player.height, 640, y * (int)player.height, GetColor(64, 64, 64));
-                    DrawString(0, y * (int)player.height, y.ToString(),GetColor(64,64,64));
+                    DrawString(0, y * (int)player.height, y.ToString(), GetColor(64, 64, 64));
                 }
-                touchIndexDev = Touch_obj(0,new ObjType[] {ObjType.All});
+                touchIndexDev = Touch_obj(0, new ObjType[] { ObjType.All });
                 bool isp = false;
                 if (CheckHitKey(KEY_INPUT_LCONTROL) == TRUE)
                 {
-                    if(CheckHitKey(KEY_INPUT_LSHIFT) == TRUE)
+                    if (CheckHitKey(KEY_INPUT_LSHIFT) == TRUE)
                     {
                         //追加
-                        if(CheckHitKey(KEY_INPUT_A) == TRUE)
+                        if (CheckHitKey(KEY_INPUT_A) == TRUE)
                         {
-                            if(!IsShortcutPushed) ps.追加ToolStripMenuItem_Click();
+                            if (!IsShortcutPushed) ps.追加ToolStripMenuItem_Click();
                             isp = true;
                         }
                         //消去
-                        if(CheckHitKey(KEY_INPUT_DELETE) == TRUE)
+                        if (CheckHitKey(KEY_INPUT_DELETE) == TRUE)
                         {
                             isp = true;
                         }
@@ -232,45 +235,45 @@ namespace TeaShoot_3
                         }
                     }
                     //Resistを開く
-                    if(CheckHitKey(KEY_INPUT_R) == TRUE)
+                    if (CheckHitKey(KEY_INPUT_R) == TRUE)
                     {
                         if (!IsShortcutPushed) ps.registerToolStripMenuItem_Click();
                         isp = true;
                     }
                     //Propertyを開く
-                    if(CheckHitKey(KEY_INPUT_P) == TRUE)
+                    if (CheckHitKey(KEY_INPUT_P) == TRUE)
                     {
                         if (!IsShortcutPushed) ps.propertyToolStripMenuItem_Click();
                         isp = true;
                     }//保存
-                    if(CheckHitKey(KEY_INPUT_S) == TRUE)
+                    if (CheckHitKey(KEY_INPUT_S) == TRUE)
                     {
                         if (!IsShortcutPushed) ps.saveToolStripMenuItem_Click(new object(), new EventArgs());
                         isp = true;
                     }//開く
-                    if(CheckHitKey(KEY_INPUT_O) == TRUE)
+                    if (CheckHitKey(KEY_INPUT_O) == TRUE)
                     {
                         if (!IsShortcutPushed) ps.openToolStripMenuItem_Click(new object(), new EventArgs());
                         isp = true;
                     }
                 }
                 //選択する
-                if(CheckHitKey(KEY_INPUT_Z) == TRUE)
+                if (CheckHitKey(KEY_INPUT_Z) == TRUE)
                 {
-                    if(touchIndexDev != -1 && selectList.IndexOf(objList[touchIndexDev]) == -1)
+                    if (touchIndexDev != -1 && selectList.IndexOf(objList[touchIndexDev]) == -1)
                     {
                         selectList.Add(objList[touchIndexDev]);
                     }
                 }
                 //選択解除
-                if(CheckHitKey(KEY_INPUT_X) == TRUE)
+                if (CheckHitKey(KEY_INPUT_X) == TRUE)
                 {
                     selectList.Clear();
                 }
                 //選択中のオブジェクトを削除 And 削除
-                if(CheckHitKey(KEY_INPUT_C) == TRUE)
+                if (CheckHitKey(KEY_INPUT_C) == TRUE)
                 {
-                    for(int i = 0; i < selectList.Count; i++)
+                    for (int i = 0; i < selectList.Count; i++)
                     {
                         removeList.Add(SelectObjToObjList(selectList[i]));
                     }
@@ -328,7 +331,7 @@ namespace TeaShoot_3
                 //選択オブジェクトの選択中の表示
                 foreach (var abc in selectList)
                 {
-                    DrawTriangle((int)abc.Cx, (int)abc.y, (int)abc.Cx + 10, (int)abc.y, (int)abc.Cx, (int)abc.y + 10, GetColor(255,0,0), 1);
+                    DrawTriangle((int)abc.Cx, (int)abc.y, (int)abc.Cx + 10, (int)abc.y, (int)abc.Cx, (int)abc.y + 10, GetColor(255, 0, 0), 1);
                 }
 
                 IsShortcutPushed = isp;
@@ -338,14 +341,14 @@ namespace TeaShoot_3
                 {
                     int BufPutX = (int)(player.x / 50) * 50;
                     int BufPutY = (int)((int)(player.y / player.height) * player.height);
-                    if(BufPutX != PutX || BufPutY != PutY)
+                    if (BufPutX != PutX || BufPutY != PutY)
                     {
                         PutX = BufPutX;
                         PutY = BufPutY;
                         bool IsPut = true;
-                        foreach(obj obj in objList)
+                        foreach (obj obj in objList)
                         {
-                            if(obj.x == PutX && obj.y == PutY)
+                            if (obj.x == PutX && obj.y == PutY)
                             {
                                 IsPut = false;
                                 break;
@@ -355,7 +358,7 @@ namespace TeaShoot_3
                         {
                             obj o;
                             int AddNum = ps.GetListViewIndexNum();
-                            if(AddNum == 0)
+                            if (AddNum == 0)
                             {
                                 o = obj.Clone(ResistIndexOf(2));
                             }
@@ -371,7 +374,7 @@ namespace TeaShoot_3
                 }
 
                 //オブジェクトの移動
-                if(GetMouseInput() == 1)
+                if (GetMouseInput() == 1)
                 {
                     if (!IsHoldObj)
                     {
@@ -422,7 +425,7 @@ namespace TeaShoot_3
                 //ファイル名を設定
                 if (CheckHitKey(KEY_INPUT_F4) == TRUE)
                 {
-                     DevFileName = Interaction.InputBox("ファイル名を入力");
+                    DevFileName = Interaction.InputBox("ファイル名を入力");
                 }
             }
 
@@ -443,7 +446,7 @@ namespace TeaShoot_3
             //開発モードに変更
             if (CheckHitKey(KEY_INPUT_F2) == TRUE)
             {
-                for(int i = 1; i < objList.Count; i++)
+                for (int i = 1; i < objList.Count; i++)
                 {
                     removeList.Add(objList[i]);
                 }
@@ -497,7 +500,7 @@ namespace TeaShoot_3
         {
             foreach (var o in objList)
             {
-                if(o == selectObj)
+                if (o == selectObj)
                 {
                     return o;
                 }
