@@ -492,6 +492,7 @@ namespace TeaShoot_3
                 case 0:
                     return false;
                 case Boss1:
+                    if (boss1.attack != boss1.attackType.MoveLast) boss1.y = 0;
                     boss1.attack = boss1.attackType.MoveLast;
                     return boss1.IsRemove;
 
