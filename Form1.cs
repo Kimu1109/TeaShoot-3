@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable CA1416 // プラットフォームの互換性を検証
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -51,6 +53,14 @@ namespace TeaShoot_3
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            button1.Left = this.Width - 15 - button1.Width - 15;
+            button2.Left = this.Width - 30 - button1.Width - button2.Width - 15;
+            button1.Top = this.Height - 15 - button1.Height - 15;
+            button2.Top = this.Height - 15 - button1.Height - button2.Height - 15;
         }
     }
 }

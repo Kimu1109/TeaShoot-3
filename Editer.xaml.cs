@@ -45,9 +45,7 @@ namespace TeaShoot_3
                      typeof(Obj).Assembly
                 };
 
-            var roslynHost = new RoslynHost(
-                roslynPadAssemblies,
-                RoslynHostReferences.NamespaceDefault.With(assemblyReferences: assemblies));
+            var roslynHost = new CustomRoslynHost(typeof(Obj),roslynPadAssemblies,RoslynHostReferences.NamespaceDefault.With(assemblyReferences: assemblies));
 
             await roslynCodeEditor.InitializeAsync(roslynHost, new ClassificationHighlightColors(), Directory.GetCurrentDirectory(), string.Empty, Microsoft.CodeAnalysis.SourceCodeKind.Script);
         }

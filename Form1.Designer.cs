@@ -62,6 +62,7 @@
             Name = "Form1";
             Text = "コード";
             Load += Form1_Load;
+            Resize += Form1_Resize;
             ResumeLayout(false);
         }
 

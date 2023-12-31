@@ -1159,3 +1159,33 @@ namespace TeaShoot_3
         }
     }
 }
+public class CustomRoslynHost : RoslynHost
+{
+    private readonly Type _targetType;
+
+    public CustomRoslynHost(
+        Type targetType,
+        IEnumerable<Assembly> additionalAssemblies = null,
+        RoslynHostReferences references = null,
+        ImmutableArray<string>? disabledDiagnostics = null) : base(additionalAssemblies, references, disabledDiagnostics)
+    {
+        _targetType = targetType;
+    }
+
+    protected override Project CreateProject(Solution solution, DocumentCreationArgs args, CompilationOptions compilationOptions, Project previousProject = null)
+    {
+        var projectId = ProjectId.CreateNewId();
+        var projectInfo = ProjectInfo.Create(
+            projectId,
+            VersionStamp.Create(),
+            "MyProject",
+            "MyAssembly",
+            LanguageNames.CSharp,
+            compilationOptions: compilationOptions,
+            parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Script),
+            metadataReferences: DefaultReferences,
+            isSubmission: true,
+            hostObjectType: _targetType);
+        return solution.AddProject(projectInfo).GetProject(projectId);
+    }
+}
