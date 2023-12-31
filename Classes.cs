@@ -1,24 +1,24 @@
 ﻿using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.Devices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Security.Cryptography;
-using System.Security.Policy;
-using System.Windows.Forms;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using static DxLibDLL.DX;
+using RoslynPad.Roslyn;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
+using System.Collections.Immutable;
 
 namespace TeaShoot_3
 {
-    [Serializable]
     [TypeConverter(typeof(DefinitionOrderTypeConverter))]
-    public class obj
+    public class Obj
     {
         [Category("タイプ")]
         public int num { get; set; }
@@ -68,8 +68,9 @@ namespace TeaShoot_3
 
         [Category("表示")]
         public string text { get; set; }
+        [System.Xml.Serialization.XmlIgnore()]
         [Category("表示")]
-        public Color TextColor
+        public Color Color
         {
             get
             {
@@ -107,14 +108,26 @@ namespace TeaShoot_3
         [Category("プレイヤー")]
         public bool ShakeEnabled { get; set; }
 
+        [Category("開発機能")]
+        public string Code { get; set; }
+        [Category("開発機能")]
+        public string CodeInit { get; set; }
+        [Category("開発機能")]
+        public string CodeRemove { get; set; }
+        [Category("開発機能")]
+        public bool IsUseCode { get; set; }
+        public int AccessCodeIndex;
+
+        public bool IsRemove;
+
         //共通変数　及び　環境変数
         public static int camX;
-        public static obj player;
+        public static Obj player;
         public static Random rnd = new Random();
 
-        public static List<obj> objList;
-        public static List<obj> removeList;
-        public static List<obj> resistList;
+        public static List<Obj> objList;
+        public static List<Obj> removeList;
+        public static List<Obj> resistList;
 
         public static bool isDevelop;
 
@@ -149,6 +162,10 @@ namespace TeaShoot_3
 
         public const int Boss1 = 13;
 
+        public static int MiniFont;
+        public static int FileVersion;
+
+        public static List<ScriptData> scripts;
         public void Draw()
         {
             switch (num)
@@ -184,8 +201,14 @@ namespace TeaShoot_3
                     break;
             }
         }
-        public void Process(int i)
+        public async void Process(int i)
         {
+
+            if (IsUseCode)
+            {
+                RunScript(scripts[AccessCodeIndex].script);
+            }
+
             if (num == 0 && hp <= 0)
             {
                 residue--;
@@ -198,6 +221,7 @@ namespace TeaShoot_3
 
             if (!isInit)
             {
+                IsRemove = true;
                 isInit = true;
                 IsBound = true;
                 maxHP = hp;
@@ -224,6 +248,7 @@ namespace TeaShoot_3
                         y = 480 - height;
                         break;
                 }
+                RunScript(scripts[AccessCodeIndex].scriptInit);
             }
 
             double POAngle;
@@ -380,6 +405,51 @@ namespace TeaShoot_3
                     }
 
                     break;
+                case MoveType.BoundX:
+
+                    if (x < 0 || x > 640 - width)
+                    {
+                        speedX *= -1;
+                        RemoveBoundCount++;
+                        if (RemoveBoundCount >= RemoveBoundCountMax) removeList.Add(this);
+                    }
+                    x += speedX;
+                    y += speedY;
+
+                    break;
+                case MoveType.GoAwayFromBall:
+
+                    x -= 2;
+
+                    foreach (var o in objList)
+                    {
+                        if (o.type == ObjType.Ball)
+                        {
+                            if (DistanceP(point, o.point) <= 100)
+                            {
+                                TwoPointToSpeed(this, this.point, o.point);
+                                x -= speedX;
+                                y -= speedY;
+                            }
+                        }
+                    }
+
+                    break;
+                case MoveType.LittleNearNotHit:
+
+                    if (Math.Sqrt(Math.Pow(x - player.x, 2) + Math.Pow(y - player.y, 2)) > 70)
+                    {
+                        POAngle = Math.Atan2(y - player.y, x - player.x);
+                        x -=(float)(Math.Cos(POAngle) * 2);
+                        y -=(float)(Math.Sin(POAngle) * 2);
+                    }
+
+                    break;
+                case MoveType.Surprised:
+
+
+
+                    break;
             }
             switch (attack)
             {
@@ -388,7 +458,7 @@ namespace TeaShoot_3
                     if (shotInterval > 80)
                     {
                         shotInterval = 0;
-                        var shotObj = obj.Clone(ResistIndexOf(shotNum));
+                        var shotObj = Obj.Clone(ResistIndexOf(shotNum));
                         shotObj.x = x;
                         shotObj.y = y;
                         shotObj.isInit = true;
@@ -396,7 +466,7 @@ namespace TeaShoot_3
                     }
                     break;
                 case AttackType.Boss1:
-                    bosses.ProcessBoss1(i);
+                    Bosses.ProcessBoss1(i);
                     break;
                 case AttackType.Boss1_Fishing_Rod:
                     if (y <= 0)
@@ -483,17 +553,25 @@ namespace TeaShoot_3
                     }
                     break;
             }
-
         }
+        /// <summary>
+        /// 削除されるときに処理されるイベント
+        /// </summary>
+        /// <returns>削除するかどうか</returns>
         public bool RemoveEvent()
         {
+            if (IsUseCode)
+            {
+                RunScript(scripts[AccessCodeIndex].scriptRemove);
+                return IsRemove;
+            }
             switch (num)
             {
                 case 0:
                     return false;
                 case Boss1:
-                    if (boss1.attack != boss1.attackType.MoveLast) boss1.y = 0;
-                    boss1.attack = boss1.attackType.MoveLast;
+                    if (boss1.attack != boss1.attackB1.MoveLast) boss1.y = 0;
+                    boss1.attack = boss1.attackB1.MoveLast;
                     return boss1.IsRemove;
 
                 default:
@@ -506,30 +584,30 @@ namespace TeaShoot_3
             this.height = GetFontSize() * text.Replace("\r\n", "\n").Split(new[] { '\n', '\r' }).Count();
             this.width = GetDrawStringWidth(text, -1);
         }
-        public static obj Clone(obj copy)
+        public static Obj Clone(Obj copy)
         {
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Obj));
             using (MemoryStream stream = new MemoryStream())
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, copy);
+                serializer.Serialize(stream, copy);
                 stream.Position = 0;
 
-                return (obj)formatter.Deserialize(stream);
+                return (Obj)serializer.Deserialize(stream);
             }
         }
-        public static void WriteObj(obj obj, string path)
+        public static void WriteObj(Obj obj, string path)
         {
             if (obj == null) return;
             obj.boss2 = new boss2();
             obj.boss1 = new boss1();
-            using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Obj));
+            using (var sw = new StreamWriter(AppPath() + @"\resist-xml\" + obj.num + ".xml"))
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, obj);
+                serializer.Serialize(sw, obj);
             }
         }
 
-        public obj(int num, ObjType type, bool IsFitSize = true, float width = 0, float height = 0, string text = "")
+        public Obj(int num, ObjType type, bool IsFitSize = true, float width = 0, float height = 0, string text = "")
         {
             if (IsFitSize)
             {
@@ -547,8 +625,13 @@ namespace TeaShoot_3
             this.textColor = GetColor(255, 255, 255);
             this.remove = RemoveType.Normal;
         }
+        public Obj()
+        {
+
+        }
         /// <summary>
         /// いわゆる当たり判定
+        /// 
         /// </summary>
         /// <param name="i">当たっているかを確認するオブジェクト</param>
         /// <returns></returns>
@@ -581,16 +664,22 @@ namespace TeaShoot_3
         /// </summary>
         public static void ReloadResist()
         {
+            ReloadResistXML();
+        }
+        public static void ReloadResistXML()
+        {
             resistList.Clear();
-            string[] names = Directory.GetFiles(obj.AppPath() + @"\resist", "*");
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(Obj));
+            string[] names = Directory.GetFiles(Obj.AppPath() + @"\resist-xml", "*");
             foreach (string name in names)
             {
                 try
                 {
                     using (var fs = new FileStream(name, FileMode.Open, FileAccess.Read))
                     {
-                        var formatter = new BinaryFormatter();
-                        resistList.Add((obj)formatter.Deserialize(fs));
+                        //var formatter = new BinaryFormatter();
+                        //resistList.Add((obj)formatter.Deserialize(fs));
+                        resistList.Add((Obj)serializer.Deserialize(fs));
                     }
                 }
                 catch (Exception ex)
@@ -604,7 +693,7 @@ namespace TeaShoot_3
         /// </summary>
         /// <param name="num">探すobjのnum</param>
         /// <returns></returns>
-        public static obj ResistIndexOf(int num)
+        public static Obj ResistIndexOf(int num)
         {
             foreach (var item in resistList)
             {
@@ -636,7 +725,6 @@ namespace TeaShoot_3
             b = 255 - b;
             return GetColor(r, g, b);
         }
-
         public static double Distance(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
@@ -658,7 +746,7 @@ namespace TeaShoot_3
         /// 1は足し算
         /// 2は引き算
         /// </param>
-        public static void TwoPointToSpeed(obj o, Point p1, Point p2, int type = 0)
+        public static void TwoPointToSpeed(Obj o, Point p1, Point p2, int type = 0)
         {
             double angle;
             switch (type)
@@ -828,7 +916,12 @@ namespace TeaShoot_3
             BoundSuper = 7,
             Gravity = 8,
             PlayerBall = 9,
-            Shake = 10
+            Shake = 10,
+            GoAwayFromBall = 11,
+            LittleNearNotHit = 12,
+            NotNear = 13,
+            Surprised = 14,
+            BoundX = 15
         }
         //命名法則: 基本逆で書くこと,Fire=間隔が早い,Little=間隔が遅い or 効果が弱い
         public enum AttackType
@@ -839,6 +932,9 @@ namespace TeaShoot_3
             Boss1 = 3,
             Boss1_Fishing_Rod = 300,
             Boss1_Fishing_Fish = 301,
+            NearFirstAndFast = 4,
+            CycleShot = 5,
+            NormalFireSuper = 6
         }
         public enum RemoveType
         {
@@ -904,7 +1000,7 @@ namespace TeaShoot_3
             debugTime = newTime;
 
             ClearDrawScreen();
-            if ((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawString(50, 40, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)) + "\nScrollX:" + ScrollX.ToString(), GetColor(255, 255, 255));
+            if ((isDevelop && CheckHitKey(KEY_INPUT_Q) == TRUE) || !isDevelop) DrawStringToHandle(50, 40, FPS.ToString() + "FPS\nObjNum:" + objList.Count.ToString() + "\nBuildNum:" + BuildNum.ToString() + "\nLastBuild:" + LastBuild.ToString() + "\nCamX:" + camX.ToString() + "\nDevFileName:" + DevFileName + "\nDebugTime:" + ((double)(debugTime - debugStartTime) / 1000).ToString() + "s\n予想時間:" + SecondToTime((int)(player.x * 0.02)) + "\nScrollX:" + ScrollX.ToString(), GetColor(255, 255, 255),MiniFont);
 
             DrawString(0, 20, "Score:" + player.score.ToString(), GetColor(255, 255, 255));
         }
@@ -948,6 +1044,55 @@ namespace TeaShoot_3
                 return new Point(x, y);
             }
         }
+        private async void RunScript(Script script)
+        {
+            try
+            {
+                await script.RunAsync(this);
+            }
+            catch (Exception e)
+            {
+                DrawStringToHandle(200, 40, e.Message, GetColor(255, 255, 255), MiniFont);
+            }
+        }
+
+
+
+        //開発用の関数たち
+
+        public double ToRadian(int angle)
+        {
+            return angle * Math.PI / 180f;
+        }
+        public int ToAngle(double radian)
+        {
+            return (int)(radian * 180 / Math.PI);
+        }
+        public double DistanceFromPlayer()
+        {
+            return Math.Sqrt(Math.Pow(x - player.x, 2) + Math.Pow(y - player.y, 2));
+        }
+        public List<Obj> SearchFromNum(int num)
+        {
+            var l = new List<Obj>();
+            foreach(var o in objList)
+                if (o.num == num) l.Add(o);
+            return l;
+        }
+        public double DistanceFromObj(Obj o)
+        {
+            return Math.Sqrt(Math.Pow(o.x - player.x, 2) + Math.Pow(o.y - player.y, 2));
+        }
+        public double TwoPointToRadian(Point p1, Point p2)
+        {
+            return Math.Atan2(p2.y - p1.y, p2.x - p1.x);
+        }
+        public void RadianToSpeed(double radian)
+        {
+            this.speedX = (float)Math.Cos(radian);
+            this.speedY = (float)Math.Sin(radian);
+        }
+        
     }
     /// <summary>
     /// プロパティグリッドのプロパティの並び順をソート
@@ -997,6 +1142,20 @@ namespace TeaShoot_3
         {
             this.point1 = point1;
             this.point2 = point2;
+        }
+    }
+    public class ScriptData
+    {
+        public Script script;
+        public Script scriptInit;
+        public Script scriptRemove;
+        public int num;
+        public ScriptData(Script script, Script scriptInit, Script scriptRemove, int num)
+        {
+            this.script = script;
+            this.scriptInit = scriptInit;
+            this.scriptRemove = scriptRemove;
+            this.num = num;
         }
     }
 }

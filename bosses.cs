@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static TeaShoot_3.obj;
+using static TeaShoot_3.Obj;
 using static DxLibDLL.DX;
 using Microsoft.VisualBasic;
+using System.Numerics;
 
 namespace TeaShoot_3
 {
-    public static class bosses
+    public static class Bosses
     {
         public static void ProcessBoss1(int i)
         {
@@ -21,7 +22,7 @@ namespace TeaShoot_3
 
             switch (b1b.attack)
             {
-                case boss1.attackType.MoveFirst:
+                case boss1.attackB1.MoveFirst:
                     if (Math.Sqrt(Math.Pow(b1.x - (640 - b1.width), 2) + Math.Pow(b1.y - (240 - b1.height / 2), 2)) <= 10)
                     {
                         b1b.nextAttack();
@@ -33,7 +34,7 @@ namespace TeaShoot_3
                     b1.y -= (float)Math.Sin(angle);
 
                     break;
-                case boss1.attackType.Fishing:
+                case boss1.attackB1.Fishing:
 
                     if (b1b.y == 0)
                     {
@@ -74,12 +75,12 @@ namespace TeaShoot_3
                     }
 
                     break;
-                case boss1.attackType.Kidding:
+                case boss1.attackB1.Kidding:
 
                     if (b1b.y == 0)
                     {
                         b1.FitText(ReadAscii("boss1-kidding"));
-                        b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                        b1b.kidding = (boss1.kiddingB1)rnd.Next((int)boss1.kiddingB1.UpToDownWithSideMove, (int)boss1.kiddingB1.RandomY + 1);
                         b1b.y = -1;
                         b1b.isLeft = false;
                     }
@@ -97,7 +98,7 @@ namespace TeaShoot_3
                     {
                         switch (b1b.kidding)
                         {
-                            case boss1.kiddingType.UpToDownWithSideMove:
+                            case boss1.kiddingB1.UpToDownWithSideMove:
                                 if (b1b.kiddingInit)
                                 {
                                     b1.y = 0;
@@ -115,7 +116,7 @@ namespace TeaShoot_3
                                         {
                                             b1b.kiddingInit = true;
                                             b1b.attackNum += 5;
-                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                            b1b.kidding = (boss1.kiddingB1)rnd.Next((int)boss1.kiddingB1.UpToDownWithSideMove, (int)boss1.kiddingB1.RandomY + 1);
                                         }
                                     }
                                 }
@@ -130,12 +131,12 @@ namespace TeaShoot_3
                                         {
                                             b1b.kiddingInit = true;
                                             b1b.attackNum += 5;
-                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                            b1b.kidding = (boss1.kiddingB1)rnd.Next((int)boss1.kiddingB1.UpToDownWithSideMove, (int)boss1.kiddingB1.RandomY + 1);
                                         }
                                     }
                                 }
                                 break;
-                            case boss1.kiddingType.MoveToPlayer:
+                            case boss1.kiddingB1.MoveToPlayer:
                                 if (b1b.kiddingInit)
                                 {
                                     b1.y = rnd.Next(0, (int)(480 - b1.height));
@@ -178,7 +179,7 @@ namespace TeaShoot_3
                                         if (b1b.attackNum % 5 == 0)
                                         {
                                             b1b.kiddingInit = true;
-                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                            b1b.kidding = (boss1.kiddingB1)rnd.Next((int)boss1.kiddingB1.UpToDownWithSideMove, (int)boss1.kiddingB1.RandomY + 1);
                                         }
                                         else
                                         {
@@ -188,7 +189,7 @@ namespace TeaShoot_3
                                     }
                                 }
                                 break;
-                            case boss1.kiddingType.RandomY:
+                            case boss1.kiddingB1.RandomY:
                                 if (b1b.kiddingInit)
                                 {
                                     b1.y = rnd.Next(0, (int)(480 - b1.height));
@@ -231,7 +232,7 @@ namespace TeaShoot_3
                                         if (b1b.attackNum % 5 == 0)
                                         {
                                             b1b.kiddingInit = true;
-                                            b1b.kidding = (boss1.kiddingType)rnd.Next((int)boss1.kiddingType.UpToDownWithSideMove, (int)boss1.kiddingType.RandomY + 1);
+                                            b1b.kidding = (boss1.kiddingB1)rnd.Next((int)boss1.kiddingB1.UpToDownWithSideMove, (int)boss1.kiddingB1.RandomY + 1);
                                         }
                                         else
                                         {
@@ -270,7 +271,7 @@ namespace TeaShoot_3
                     }
 
                     break;
-                case boss1.attackType.Punch:
+                case boss1.attackB1.Punch:
 
                     if (b1b.y == 0)
                     {
@@ -309,7 +310,7 @@ namespace TeaShoot_3
                     }
 
                     break;
-                case boss1.attackType.BoundFish:
+                case boss1.attackB1.BoundFish:
 
                     if (b1b.y == 0)
                     {
@@ -353,7 +354,7 @@ namespace TeaShoot_3
                     }
 
                     break;
-                case boss1.attackType.PunchPlus:
+                case boss1.attackB1.PunchPlus:
 
                     if (b1b.y == 0)
                     {
@@ -405,7 +406,7 @@ namespace TeaShoot_3
                     }
 
                     break;
-                case boss1.attackType.MoveLast:
+                case boss1.attackB1.MoveLast:
 
                     if (b1b.y == 0)
                     {
@@ -457,7 +458,7 @@ namespace TeaShoot_3
 
             switch (b2b.attack)
             {
-                case boss2.attackType.MoveFirst:
+                case boss2.attackB2.MoveFirst:
 
                     if (Math.Sqrt(Math.Pow(b2.x - (640 - b2.width), 2) + Math.Pow(b2.y - (240 - b2.height / 2), 2)) <= 10)
                     {
@@ -469,7 +470,7 @@ namespace TeaShoot_3
                     b2.y -= (float)Math.Sin(angle);
 
                     break;
-                case boss2.attackType.ShieldWall:
+                case boss2.attackB2.ShieldWall:
                     b2b.attackWait++;
                     if (b2b.attackWait >= 120)
                     {
@@ -506,14 +507,13 @@ namespace TeaShoot_3
 
 
     }
-    [Serializable]
     public class boss1
     {
-        public attackType attack;
+        public attackB1 attack;
         public int attackWait;
         public int attackNum;
         public bool isRandom;
-        public kiddingType kidding;
+        public kiddingB1 kidding;
 
         public int x;
         public int y;
@@ -533,7 +533,7 @@ namespace TeaShoot_3
 
         public bool IsRemove;
 
-        public enum attackType
+        public enum attackB1
         {
             MoveFirst = 0,
             Fishing = 1,
@@ -543,7 +543,7 @@ namespace TeaShoot_3
             PunchPlus = 5,
             MoveLast = 6
         }
-        public enum kiddingType
+        public enum kiddingB1
         {
             UpToDownWithSideMove = 0,
             MoveToPlayer = 1,
@@ -553,13 +553,13 @@ namespace TeaShoot_3
         {
             if (!isRandom)
             {
-                if (attack == attackType.PunchPlus)
+                if (attack == attackB1.PunchPlus)
                 {
                     isRandom = true;
                 }
                 else
                 {
-                    attack = (attackType)((int)attack + 1);
+                    attack = (attackB1)((int)attack + 1);
                     attackNum = 0;
                     attackWait = 0;
                     x = 0;
@@ -568,7 +568,7 @@ namespace TeaShoot_3
             }
             if (isRandom)
             {
-                attack = (attackType)obj.rnd.Next((int)attackType.Fishing, (int)attackType.PunchPlus);
+                attack = (attackB1)Obj.rnd.Next((int)attackB1.Fishing, (int)attackB1.PunchPlus);
                 attackNum = 0;
                 attackWait = 0;
                 x = 0;
@@ -578,10 +578,9 @@ namespace TeaShoot_3
 
     }
 
-    [Serializable]
     public class boss2
     {
-        public attackType attack;
+        public attackB2 attack;
         public int attackWait;
         public int attackNum;
         public bool isRandom;
@@ -589,7 +588,7 @@ namespace TeaShoot_3
         public int x;
         public int y;
 
-        public enum attackType
+        public enum attackB2
         {
             MoveFirst = 0,
             ShieldWall = 1,
@@ -606,20 +605,20 @@ namespace TeaShoot_3
         {
             if (!isRandom)
             {
-                if (attack == attackType.CoffeeFire)
+                if (attack == attackB2.CoffeeFire)
                 {
                     isRandom = true;
                 }
                 else
                 {
-                    attack = (attackType)((int)attack + 1);
+                    attack = (attackB2)((int)attack + 1);
                     attackNum = 0;
                     attackWait = 0;
                 }
             }
             if (isRandom)
             {
-                attack = (attackType)obj.rnd.Next((int)attackType.ShieldWall, (int)attackType.CoffeeFire);
+                attack = (attackB2)Obj.rnd.Next((int)attackB2.ShieldWall, (int)attackB2.CoffeeFire);
                 attackNum = 0;
                 attackWait = 0;
             }

@@ -28,71 +28,76 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.groupBox1.SuspendLayout();
-            this.SuspendLayout();
+            textBox1 = new System.Windows.Forms.TextBox();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            button2 = new System.Windows.Forms.Button();
+            button1 = new System.Windows.Forms.Button();
+            groupBox1.SuspendLayout();
+            SuspendLayout();
             // 
             // textBox1
             // 
-            this.textBox1.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.textBox1.Location = new System.Drawing.Point(12, 12);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(601, 301);
-            this.textBox1.TabIndex = 0;
+            textBox1.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 128);
+            textBox1.Location = new System.Drawing.Point(14, 15);
+            textBox1.Margin = new System.Windows.Forms.Padding(4);
+            textBox1.Multiline = true;
+            textBox1.Name = "textBox1";
+            textBox1.Size = new System.Drawing.Size(700, 375);
+            textBox1.TabIndex = 0;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.button2);
-            this.groupBox1.Controls.Add(this.button1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 319);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(601, 61);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            // 
-            // button1
-            // 
-            this.button1.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.button1.Location = new System.Drawing.Point(468, 17);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(127, 38);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "決定";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            groupBox1.Controls.Add(button2);
+            groupBox1.Controls.Add(button1);
+            groupBox1.Location = new System.Drawing.Point(14, 399);
+            groupBox1.Margin = new System.Windows.Forms.Padding(4);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Padding = new System.Windows.Forms.Padding(4);
+            groupBox1.Size = new System.Drawing.Size(701, 76);
+            groupBox1.TabIndex = 1;
+            groupBox1.TabStop = false;
             // 
             // button2
             // 
-            this.button2.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.button2.Location = new System.Drawing.Point(294, 18);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(127, 38);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "キャンセル";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            button2.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 128);
+            button2.Location = new System.Drawing.Point(343, 22);
+            button2.Margin = new System.Windows.Forms.Padding(4);
+            button2.Name = "button2";
+            button2.Size = new System.Drawing.Size(148, 48);
+            button2.TabIndex = 2;
+            button2.Text = "キャンセル";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
+            // button1
+            // 
+            button1.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 128);
+            button1.Location = new System.Drawing.Point(546, 21);
+            button1.Margin = new System.Windows.Forms.Padding(4);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(148, 48);
+            button1.TabIndex = 0;
+            button1.Text = "決定";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // TextDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 387);
-            this.ControlBox = false;
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.textBox1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "TextDialog";
-            this.Text = "TextDialog";
-            this.TopMost = true;
-            this.Load += new System.EventHandler(this.TextDialog_Load);
-            this.groupBox1.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(735, 489);
+            ControlBox = false;
+            Controls.Add(groupBox1);
+            Controls.Add(textBox1);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            Margin = new System.Windows.Forms.Padding(4);
+            Name = "TextDialog";
+            Text = "TextDialog";
+            TopMost = true;
+            Load += TextDialog_Load;
+            groupBox1.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

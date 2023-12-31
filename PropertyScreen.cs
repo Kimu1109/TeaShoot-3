@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable CA1416
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static TeaShoot_3.obj;
+using static TeaShoot_3.Obj;
 using static DxLibDLL.DX;
 using Microsoft.VisualBasic;
 
@@ -25,6 +27,7 @@ namespace TeaShoot_3
         public PropertyScreen()
         {
             InitializeComponent();
+            PropertyScreen_Resize(new object(), new EventArgs());
         }
 
         private void propertyGrid1_Resize(object sender, EventArgs e)
@@ -33,10 +36,14 @@ namespace TeaShoot_3
 
         private void PropertyScreen_Resize(object sender, EventArgs e)
         {
-            propertyGrid1.Width = this.Width - 15;
-            propertyGrid1.Height = this.Height - 15 - 15 - this.Top;
+            propertyGrid1.Width = (this.Width - 15) / 2;
+            propertyGrid1.Height = this.Height - 15 - 15;
+
+            listView1.Left = propertyGrid1.Width;
+            listView1.Width = propertyGrid1.Width;
+            listView1.Height = propertyGrid1.Height;
         }
-        public void SetPsObj(obj o)
+        public void SetPsObj(Obj o)
         {
             propertyGrid1.SelectedObject = o;
         }
@@ -73,7 +80,10 @@ namespace TeaShoot_3
 
         public void 追加ToolStripMenuItem_Click()
         {
-            resistList.Add(new obj(resistList.Count, obj.ObjType.Enemy, text: "(;-;)"));
+            int maxNum = 0;
+            foreach(var r in resistList) if (maxNum < r.num) maxNum = r.num;
+
+            resistList.Add(new Obj(maxNum+1, Obj.ObjType.Enemy, text: "(;-;)"));
             DrawResist();
         }
 
@@ -86,7 +96,7 @@ namespace TeaShoot_3
         {
             foreach(var obj in resistList)
             {
-                obj.WriteObj(obj, obj.AppPath() + @"\resist\" + obj.num + ".dat");
+                Obj.WriteObj(obj, Obj.AppPath() + @"\resist\" + obj.num + ".dat");
             }
             MessageBox.Show("finished!");
         }
@@ -111,7 +121,7 @@ namespace TeaShoot_3
 
         public void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var op = obj.Clone(objList[0]);
+            var op = Obj.Clone(objList[0]);
             player = op;
             objList.Clear();
             objList.Add(op);
@@ -129,7 +139,7 @@ namespace TeaShoot_3
                     {
                         if (Convert.ToInt32(srArr[i]) != 0)
                         {
-                            var o = obj.Clone(ResistIndexOf(Convert.ToInt32(srArr[i])));
+                            var o = Obj.Clone(ResistIndexOf(Convert.ToInt32(srArr[i])));
                             o.y = i * fontHeight;
                             o.x = mapX * 50;
                             objList.Add(o);
@@ -146,7 +156,7 @@ namespace TeaShoot_3
 
         public void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using(var sw = new StreamWriter(obj.AppPath() + @"\map\" + DevFileName))
+            using(var sw = new StreamWriter(Obj.AppPath() + @"\map\" + DevFileName))
             {
                 var writeList = new List<int[]>();
                 int nowSpace = 0;
@@ -255,6 +265,18 @@ namespace TeaShoot_3
         private void 再読み込みToolStripMenuItem_Click(object sender, EventArgs e)
         {
             再読み込みToolStripMenuItem_Click();
+        }
+
+        private void コードを編集ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var n = new Form1())
+            {
+                n.code = resistList[listView1.SelectedIndices[0]].Code;
+                if (n.ShowDialog() == DialogResult.OK)
+                {
+                    resistList[listView1.SelectedIndices[0]].Code = n.code;
+                }
+            }
         }
     }
 }

@@ -7,7 +7,9 @@ using System.Windows.Forms;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using static DxLibDLL.DX;
-using static TeaShoot_3.obj;
+using static TeaShoot_3.Obj;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace TeaShoot_3
 {
@@ -15,15 +17,15 @@ namespace TeaShoot_3
     {
 
         //メイン変数
-        public static List<obj> selectList;
+        public static List<Obj> selectList;
 
         static int shotInterval;
 
-        static obj ball;
+        static Obj ball;
 
         static string mapFile;
 
-        static List<obj[]> mapList;
+        static List<Obj[]> mapList;
 
         //開発変数
         static int posX;
@@ -38,7 +40,7 @@ namespace TeaShoot_3
         static bool IsClickArrow;
 
         static bool IsHoldObj;
-        static obj HoldObj;
+        static Obj HoldObj;
 
         static PropertyScreen ps;
 
@@ -48,6 +50,7 @@ namespace TeaShoot_3
         static bool isS;
         static bool isD;
 
+        static int DownloadProgress;
         [STAThread]
         public static void Main()
         {
@@ -64,11 +67,11 @@ namespace TeaShoot_3
             LastBuild = DateTime.Now.ToString();
 
             //オブジェクトの初期化
-            objList = new List<obj>();
-            removeList = new List<obj>();
-            resistList = new List<obj>();
-            selectList = new List<obj>();
-            mapList = new List<obj[]>();
+            objList = new List<Obj>();
+            removeList = new List<Obj>();
+            resistList = new List<Obj>();
+            selectList = new List<Obj>();
+            mapList = new List<Obj[]>();
             ps = new PropertyScreen();
             fps = 100;
             idealSleep = 1000 / fps;
@@ -86,15 +89,41 @@ namespace TeaShoot_3
                 Environment.Exit(0);
             }
 
+            MiniFont = CreateFontToHandle("ＭＳ Ｐゴシック", 12, 0);
             ChangeFont("ＭＳ Ｐゴシック");
+
+            goto InternetCheckSkip;
+            if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            {
+                System.Diagnostics.FileVersionInfo ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                FileVersion = Convert.ToInt32(string.Join("", ver.FileVersion.Split('.')));
+
+                var IsDownload = new System.Net.WebClient();
+
+
+            }
+            else
+            {
+                MessageBox.Show("インターネットに現在接続されていません。\nそのためアップデートパッケージを確認することができません。");
+            }
+            InternetCheckSkip:
 
             //登録オブジェクトの読み込み及び設定。
             ReloadResist();
+            scripts = new List<ScriptData>();
 
             foreach (var o in resistList)
             {
                 o.FitText(o.text);
-                obj.WriteObj(o, obj.AppPath() + @"\resist\" + o.num.ToString() + ".dat");
+                Obj.WriteObj(o, Obj.AppPath() + @"\resist\" + o.num.ToString() + ".dat");
+                if (o.IsUseCode)
+                {
+                    if (o.Code == null) o.Code = "";
+                    if (o.CodeInit == null) o.CodeInit = "";
+                    if (o.CodeRemove == null) o.CodeRemove = "";
+                    scripts.Add(new ScriptData(CSharpScript.Create(o.Code, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeInit, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeRemove, globalsType: typeof(Obj)), o.num));
+                    o.AccessCodeIndex = scripts.Count - 1;
+                }
             }
 
             objList.Add(ResistIndexOf(0));
@@ -111,11 +140,11 @@ namespace TeaShoot_3
 
                 for (int i = 0; i < objList.Count; i++)
                 {
-                    objList[i].Draw();
                     if (!isDevelop)
                     {
                         objList[i].Process(i);
                     }
+                    objList[i].Draw();
                 }
                 //自動消去
                 foreach (var o in removeList)
@@ -136,7 +165,7 @@ namespace TeaShoot_3
                             foreach (var abc in mapList[ScrollX])
                             {
                                 if (abc != null)
-                                    objList.Add(obj.Clone(abc));
+                                    objList.Add(Obj.Clone(abc));
                             }
                         }
                     }
@@ -173,7 +202,7 @@ namespace TeaShoot_3
                     {
                         ball.x = player.x + player.width;
                         ball.y = player.y;
-                        objList.Add(obj.Clone(ball));
+                        objList.Add(Obj.Clone(ball));
                         shotInterval = 10;
                     }
                     shotInterval = Math.Max(shotInterval - 1, 0);
@@ -346,7 +375,7 @@ namespace TeaShoot_3
                         PutX = BufPutX;
                         PutY = BufPutY;
                         bool IsPut = true;
-                        foreach (obj obj in objList)
+                        foreach (Obj obj in objList)
                         {
                             if (obj.x == PutX && obj.y == PutY)
                             {
@@ -356,15 +385,15 @@ namespace TeaShoot_3
                         }
                         if (IsPut)
                         {
-                            obj o;
+                            Obj o;
                             int AddNum = ps.GetListViewIndexNum();
                             if (AddNum == 0)
                             {
-                                o = obj.Clone(ResistIndexOf(2));
+                                o = Obj.Clone(ResistIndexOf(2));
                             }
                             else
                             {
-                                o = obj.Clone(ResistIndexOf(AddNum));
+                                o = Obj.Clone(ResistIndexOf(AddNum));
                             }
                             o.x = PutX;
                             o.y = PutY;
@@ -400,7 +429,7 @@ namespace TeaShoot_3
                 GetMousePoint(out posX, out posY);
                 if (posY < 0) posY = 0;
                 if (posY > 480) posY = 480;
-                player.x = posX + obj.camX;
+                player.x = posX + Obj.camX;
                 player.y = posY;
 
                 //カメラの位置を左
@@ -408,14 +437,14 @@ namespace TeaShoot_3
                 if (CheckHitKey(KEY_INPUT_LEFT) == TRUE)
                 {
                     camXPlus = Math.Max(1, camXPlus + 0.1);
-                    obj.camX = Math.Max(obj.camX - (int)camXPlus, 0);
+                    Obj.camX = Math.Max(Obj.camX - (int)camXPlus, 0);
                     IsClickArrow = true;
                 }
                 //カメラの位置を右
                 if (CheckHitKey(KEY_INPUT_RIGHT) == TRUE)
                 {
                     camXPlus = Math.Max(1, camXPlus + 0.1);
-                    obj.camX += (int)camXPlus;
+                    Obj.camX += (int)camXPlus;
                     IsClickArrow = true;
                 }
                 if (!IsClickArrow)
@@ -465,7 +494,7 @@ namespace TeaShoot_3
         /// </summary>
         private static void ReadMapFile()
         {
-            var op = obj.Clone(objList[0]);
+            var op = Obj.Clone(objList[0]);
             player = op;
             objList.Clear();
             objList.Add(op);
@@ -477,14 +506,14 @@ namespace TeaShoot_3
                 string st = sr.ReadLine();
                 while (st != null)
                 {
-                    var objArr = new obj[480 / (int)player.height + 1];
+                    var objArr = new Obj[480 / (int)player.height + 1];
                     var srArr = st.Split('/');
 
                     for (int i = 0; i < srArr.Count(); i++)
                     {
                         if (Convert.ToInt32(srArr[i]) != 0)
                         {
-                            var o = obj.Clone(ResistIndexOf(Convert.ToInt32(srArr[i])));
+                            var o = Obj.Clone(ResistIndexOf(Convert.ToInt32(srArr[i])));
                             o.y = i * fontHeight;
                             objArr[i] = o;
                         }
@@ -496,7 +525,7 @@ namespace TeaShoot_3
                 }
             }
         }
-        private static obj SelectObjToObjList(obj selectObj)
+        private static Obj SelectObjToObjList(Obj selectObj)
         {
             foreach (var o in objList)
             {
@@ -506,6 +535,14 @@ namespace TeaShoot_3
                 }
             }
             return null;
+        }
+        public static void downloadClient_DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
+        {
+            DownloadProgress = e.ProgressPercentage;
+        }
+        public static void downloadClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+
         }
     }
 }
