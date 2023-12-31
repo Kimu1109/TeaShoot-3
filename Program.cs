@@ -92,22 +92,6 @@ namespace TeaShoot_3
             MiniFont = CreateFontToHandle("ＭＳ Ｐゴシック", 12, 0);
             ChangeFont("ＭＳ Ｐゴシック");
 
-            goto InternetCheckSkip;
-            if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
-            {
-                System.Diagnostics.FileVersionInfo ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                FileVersion = Convert.ToInt32(string.Join("", ver.FileVersion.Split('.')));
-
-                var IsDownload = new System.Net.WebClient();
-
-
-            }
-            else
-            {
-                MessageBox.Show("インターネットに現在接続されていません。\nそのためアップデートパッケージを確認することができません。");
-            }
-            InternetCheckSkip:
-
             //登録オブジェクトの読み込み及び設定。
             ReloadResist();
             scripts = new List<ScriptData>();

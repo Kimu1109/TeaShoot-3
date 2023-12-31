@@ -42,6 +42,8 @@
             テキストを設定ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             テキストフィットToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             コードを編集ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            codeRemoveを編集ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            codeInitを編集ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,6 +53,7 @@
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
+            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -59,7 +62,7 @@
             // 
             propertyGrid1.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 128);
             propertyGrid1.Location = new System.Drawing.Point(0, 34);
-            propertyGrid1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            propertyGrid1.Margin = new System.Windows.Forms.Padding(4);
             propertyGrid1.Name = "propertyGrid1";
             propertyGrid1.Size = new System.Drawing.Size(366, 522);
             propertyGrid1.TabIndex = 0;
@@ -72,7 +75,7 @@
             listView1.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 128);
             listView1.FullRowSelect = true;
             listView1.Location = new System.Drawing.Point(374, 27);
-            listView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            listView1.Margin = new System.Windows.Forms.Padding(4);
             listView1.Name = "listView1";
             listView1.Size = new System.Drawing.Size(366, 522);
             listView1.TabIndex = 2;
@@ -90,9 +93,9 @@
             // 
             // contextMenuStrip1
             // 
-            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { 追加ToolStripMenuItem, toolStripMenuItem2, 保存ToolStripMenuItem, 再読み込みToolStripMenuItem, toolStripMenuItem4, テキストを設定ToolStripMenuItem, テキストフィットToolStripMenuItem, コードを編集ToolStripMenuItem });
+            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { 追加ToolStripMenuItem, toolStripMenuItem2, 保存ToolStripMenuItem, 再読み込みToolStripMenuItem, toolStripMenuItem4, テキストを設定ToolStripMenuItem, テキストフィットToolStripMenuItem, toolStripSeparator1, コードを編集ToolStripMenuItem, codeRemoveを編集ToolStripMenuItem, codeInitを編集ToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new System.Drawing.Size(205, 148);
+            contextMenuStrip1.Size = new System.Drawing.Size(205, 198);
             // 
             // 追加ToolStripMenuItem
             // 
@@ -149,6 +152,20 @@
             コードを編集ToolStripMenuItem.Text = "コードを編集";
             コードを編集ToolStripMenuItem.Click += コードを編集ToolStripMenuItem_Click;
             // 
+            // codeRemoveを編集ToolStripMenuItem
+            // 
+            codeRemoveを編集ToolStripMenuItem.Name = "codeRemoveを編集ToolStripMenuItem";
+            codeRemoveを編集ToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            codeRemoveを編集ToolStripMenuItem.Text = "CodeRemoveを編集";
+            codeRemoveを編集ToolStripMenuItem.Click += codeRemoveを編集ToolStripMenuItem_Click;
+            // 
+            // codeInitを編集ToolStripMenuItem
+            // 
+            codeInitを編集ToolStripMenuItem.Name = "codeInitを編集ToolStripMenuItem";
+            codeInitを編集ToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            codeInitを編集ToolStripMenuItem.Text = "CodeInitを編集";
+            codeInitを編集ToolStripMenuItem.Click += codeInitを編集ToolStripMenuItem_Click;
+            // 
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openFileDialog1";
@@ -164,7 +181,7 @@
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             saveToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
-            saveToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
             // 
@@ -172,32 +189,32 @@
             // 
             openToolStripMenuItem.Name = "openToolStripMenuItem";
             openToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
-            openToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             openToolStripMenuItem.Text = "Open";
             openToolStripMenuItem.Click += openToolStripMenuItem_Click;
             // 
             // toolStripMenuItem3
             // 
             toolStripMenuItem3.Name = "toolStripMenuItem3";
-            toolStripMenuItem3.Size = new System.Drawing.Size(142, 6);
+            toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
             // 
             // devFileNameToolStripMenuItem
             // 
             devFileNameToolStripMenuItem.Name = "devFileNameToolStripMenuItem";
-            devFileNameToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            devFileNameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             devFileNameToolStripMenuItem.Text = "DevFileName";
             devFileNameToolStripMenuItem.Click += devFileNameToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new System.Drawing.Size(142, 6);
+            toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             exitToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            exitToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -211,6 +228,11 @@
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new System.Drawing.Size(201, 6);
+            // 
             // PropertyScreen
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -221,7 +243,7 @@
             Controls.Add(propertyGrid1);
             ImeMode = System.Windows.Forms.ImeMode.On;
             MainMenuStrip = menuStrip1;
-            Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            Margin = new System.Windows.Forms.Padding(4);
             Name = "PropertyScreen";
             Text = "PropertyScreen";
             Load += PropertyScreen_Load;
@@ -257,5 +279,8 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem コードを編集ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem codeRemoveを編集ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem codeInitを編集ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

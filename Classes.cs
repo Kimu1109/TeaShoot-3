@@ -120,6 +120,10 @@ namespace TeaShoot_3
 
         public bool IsRemove;
 
+        [System.Xml.Serialization.XmlIgnore()]
+        public List<dynamic> lib = new List<dynamic>();
+
+
         //共通変数　及び　環境変数
         public static int camX;
         public static Obj player;

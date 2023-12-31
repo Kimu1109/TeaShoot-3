@@ -60,7 +60,7 @@ namespace TeaShoot_3
         private void DrawResist()
         {
             listView1.Items.Clear();
-            foreach(var l in resistList)
+            foreach (var l in resistList)
             {
                 var li = new ListViewItem(l.num.ToString());
                 li.SubItems.Add(l.text);
@@ -81,9 +81,9 @@ namespace TeaShoot_3
         public void 追加ToolStripMenuItem_Click()
         {
             int maxNum = 0;
-            foreach(var r in resistList) if (maxNum < r.num) maxNum = r.num;
+            foreach (var r in resistList) if (maxNum < r.num) maxNum = r.num;
 
-            resistList.Add(new Obj(maxNum+1, Obj.ObjType.Enemy, text: "(;-;)"));
+            resistList.Add(new Obj(maxNum + 1, Obj.ObjType.Enemy, text: "(;-;)"));
             DrawResist();
         }
 
@@ -94,7 +94,7 @@ namespace TeaShoot_3
 
         public void 保存ToolStripMenuItem_Click()
         {
-            foreach(var obj in resistList)
+            foreach (var obj in resistList)
             {
                 Obj.WriteObj(obj, Obj.AppPath() + @"\resist\" + obj.num + ".dat");
             }
@@ -109,7 +109,7 @@ namespace TeaShoot_3
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
-            if(listView1.SelectedIndices.Count <= 0) { return; }
+            if (listView1.SelectedIndices.Count <= 0) { return; }
             propertyGrid1.SelectedObject = resistList[listView1.SelectedIndices[0]];
             propertyGrid1.BringToFront();
         }
@@ -156,16 +156,20 @@ namespace TeaShoot_3
 
         public void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using(var sw = new StreamWriter(Obj.AppPath() + @"\map\" + DevFileName))
+            if(File.Exists(Obj.AppPath() + @"\map\" + DevFileName))
+            {
+                File.Copy(Obj.AppPath() + @"\map\" + DevFileName, Obj.AppPath() + @"\backup\" + DevFileName + "." + rnd.NextInt64(0,99999999999999).ToString() + ".dat");
+            }
+            using (var sw = new StreamWriter(Obj.AppPath() + @"\map\" + DevFileName))
             {
                 var writeList = new List<int[]>();
                 int nowSpace = 0;
                 int fontHeight = GetFontSize();
                 int maxX = -1;
 
-                foreach(var orz in objList)
+                foreach (var orz in objList)
                 {
-                    if(orz.x > maxX)
+                    if (orz.x > maxX)
                     {
                         maxX = (int)orz.x;
                     }
@@ -176,9 +180,9 @@ namespace TeaShoot_3
                 while (nowSpace * 50 <= maxX)
                 {
                     var YList = new int[480 / fontHeight + 1];
-                    foreach(var o in objList)
+                    foreach (var o in objList)
                     {
-                        if(o.num != 0)
+                        if (o.num != 0)
                         {
                             if ((int)o.x == nowSpace * 50)
                             {
@@ -190,7 +194,7 @@ namespace TeaShoot_3
 
                     nowSpace += 1;
                 }
-                foreach(var i in writeList)
+                foreach (var i in writeList)
                 {
                     string writeStr = "";
                     foreach (var n in i)
@@ -211,7 +215,7 @@ namespace TeaShoot_3
         }
         public int GetListViewIndexNum()
         {
-            if(listView1.SelectedIndices.Count == 0) { return 0; }
+            if (listView1.SelectedIndices.Count == 0) { return 0; }
             return resistList[listView1.SelectedIndices[0]].num;
         }
 
@@ -229,7 +233,7 @@ namespace TeaShoot_3
         {
             if (listView1.SelectedIndices.Count == 0) return;
 
-            using(var n = new TextDialog())
+            using (var n = new TextDialog())
             {
                 n.text = resistList[listView1.SelectedIndices[0]].text;
                 if (n.ShowDialog() == DialogResult.OK)
@@ -275,6 +279,30 @@ namespace TeaShoot_3
                 if (n.ShowDialog() == DialogResult.OK)
                 {
                     resistList[listView1.SelectedIndices[0]].Code = n.code;
+                }
+            }
+        }
+
+        private void codeRemoveを編集ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var n = new Form1())
+            {
+                n.code = resistList[listView1.SelectedIndices[0]].CodeRemove;
+                if (n.ShowDialog() == DialogResult.OK)
+                {
+                    resistList[listView1.SelectedIndices[0]].CodeRemove = n.code;
+                }
+            }
+        }
+
+        private void codeInitを編集ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var n = new Form1())
+            {
+                n.code = resistList[listView1.SelectedIndices[0]].CodeInit;
+                if (n.ShowDialog() == DialogResult.OK)
+                {
+                    resistList[listView1.SelectedIndices[0]].CodeInit = n.code;
                 }
             }
         }
