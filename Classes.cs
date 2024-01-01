@@ -253,7 +253,7 @@ namespace TeaShoot_3
                         y = 480 - height;
                         break;
                 }
-                RunScript(scripts[AccessCodeIndex].scriptInit);
+                if(IsUseCode) RunScript(scripts[AccessCodeIndex].scriptInit);
             }
 
             double POAngle;
@@ -739,6 +739,7 @@ namespace TeaShoot_3
             ReloadResistXML();
             Console.WriteLine("hello");
             scripts.Clear();
+            int i = 0;
             foreach(var o in resistList)
             {
                 if (o.IsUseCode)
@@ -747,7 +748,8 @@ namespace TeaShoot_3
                     if (o.CodeInit == null) o.CodeInit = "";
                     if (o.CodeRemove == null) o.CodeRemove = "";
                     scripts.Add(new ScriptData(CSharpScript.Create(o.Code, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeInit, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeRemove, globalsType: typeof(Obj)), o.num));
-                    o.AccessCodeIndex = scripts.Count - 1;
+                    o.AccessCodeIndex = i;
+                    i++;
                 }
             }
         }

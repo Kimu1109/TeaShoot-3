@@ -41,6 +41,7 @@
             toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             テキストを設定ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             テキストフィットToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             コードを編集ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             codeRemoveを編集ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             codeInitを編集ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,7 +54,7 @@
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
-            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            削除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -93,9 +94,9 @@
             // 
             // contextMenuStrip1
             // 
-            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { 追加ToolStripMenuItem, toolStripMenuItem2, 保存ToolStripMenuItem, 再読み込みToolStripMenuItem, toolStripMenuItem4, テキストを設定ToolStripMenuItem, テキストフィットToolStripMenuItem, toolStripSeparator1, コードを編集ToolStripMenuItem, codeRemoveを編集ToolStripMenuItem, codeInitを編集ToolStripMenuItem });
+            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { 追加ToolStripMenuItem, 削除ToolStripMenuItem, toolStripMenuItem2, 保存ToolStripMenuItem, 再読み込みToolStripMenuItem, toolStripMenuItem4, テキストを設定ToolStripMenuItem, テキストフィットToolStripMenuItem, toolStripSeparator1, コードを編集ToolStripMenuItem, codeRemoveを編集ToolStripMenuItem, codeInitを編集ToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new System.Drawing.Size(205, 198);
+            contextMenuStrip1.Size = new System.Drawing.Size(205, 242);
             // 
             // 追加ToolStripMenuItem
             // 
@@ -145,6 +146,11 @@
             テキストフィットToolStripMenuItem.Text = "テキストフィット";
             テキストフィットToolStripMenuItem.Click += テキストフィットToolStripMenuItem_Click;
             // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new System.Drawing.Size(201, 6);
+            // 
             // コードを編集ToolStripMenuItem
             // 
             コードを編集ToolStripMenuItem.Name = "コードを編集ToolStripMenuItem";
@@ -181,7 +187,7 @@
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             saveToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
-            saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            saveToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
             // 
@@ -189,32 +195,32 @@
             // 
             openToolStripMenuItem.Name = "openToolStripMenuItem";
             openToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
-            openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            openToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             openToolStripMenuItem.Text = "Open";
             openToolStripMenuItem.Click += openToolStripMenuItem_Click;
             // 
             // toolStripMenuItem3
             // 
             toolStripMenuItem3.Name = "toolStripMenuItem3";
-            toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
+            toolStripMenuItem3.Size = new System.Drawing.Size(142, 6);
             // 
             // devFileNameToolStripMenuItem
             // 
             devFileNameToolStripMenuItem.Name = "devFileNameToolStripMenuItem";
-            devFileNameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            devFileNameToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             devFileNameToolStripMenuItem.Text = "DevFileName";
             devFileNameToolStripMenuItem.Click += devFileNameToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
+            toolStripMenuItem1.Size = new System.Drawing.Size(142, 6);
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             exitToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -228,10 +234,12 @@
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
-            // toolStripSeparator1
+            // 削除ToolStripMenuItem
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(201, 6);
+            削除ToolStripMenuItem.Name = "削除ToolStripMenuItem";
+            削除ToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            削除ToolStripMenuItem.Text = "削除";
+            削除ToolStripMenuItem.Click += 削除ToolStripMenuItem_Click_1;
             // 
             // PropertyScreen
             // 
@@ -282,5 +290,6 @@
         private System.Windows.Forms.ToolStripMenuItem codeRemoveを編集ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem codeInitを編集ToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem 削除ToolStripMenuItem;
     }
 }

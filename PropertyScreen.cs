@@ -156,9 +156,9 @@ namespace TeaShoot_3
 
         public void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(File.Exists(Obj.AppPath() + @"\map\" + DevFileName))
+            if (File.Exists(Obj.AppPath() + @"\map\" + DevFileName))
             {
-                File.Copy(Obj.AppPath() + @"\map\" + DevFileName, Obj.AppPath() + @"\backup\" + DevFileName + "." + rnd.NextInt64(0,99999999999999).ToString() + ".dat");
+                File.Copy(Obj.AppPath() + @"\map\" + DevFileName, Obj.AppPath() + @"\backup\" + DevFileName + "." + rnd.NextInt64(0, 99999999999999).ToString() + ".dat");
             }
             using (var sw = new StreamWriter(Obj.AppPath() + @"\map\" + DevFileName))
             {
@@ -305,6 +305,14 @@ namespace TeaShoot_3
                     resistList[listView1.SelectedIndices[0]].CodeInit = n.code;
                 }
             }
+        }
+
+        private void 削除ToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            if (listView1.SelectedIndices.Count == 0) return;
+            resistList.RemoveAt(listView1.SelectedIndices[0]);
+            DrawResist();
+            propertyGrid1.SelectedObject = null;
         }
     }
 }
