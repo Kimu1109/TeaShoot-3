@@ -73,6 +73,7 @@ namespace TeaShoot_3
             selectList = new List<Obj>();
             mapList = new List<Obj[]>();
             ps = new PropertyScreen();
+            scripts = new List<ScriptData>();
             fps = 100;
             idealSleep = 1000 / fps;
             DevFileName = "map1.dat";
@@ -94,20 +95,11 @@ namespace TeaShoot_3
 
             //登録オブジェクトの読み込み及び設定。
             ReloadResist();
-            scripts = new List<ScriptData>();
 
             foreach (var o in resistList)
             {
                 o.FitText(o.text);
                 Obj.WriteObj(o, Obj.AppPath() + @"\resist\" + o.num.ToString() + ".dat");
-                if (o.IsUseCode)
-                {
-                    if (o.Code == null) o.Code = "";
-                    if (o.CodeInit == null) o.CodeInit = "";
-                    if (o.CodeRemove == null) o.CodeRemove = "";
-                    scripts.Add(new ScriptData(CSharpScript.Create(o.Code, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeInit, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeRemove, globalsType: typeof(Obj)), o.num));
-                    o.AccessCodeIndex = scripts.Count - 1;
-                }
             }
 
             objList.Add(ResistIndexOf(0));

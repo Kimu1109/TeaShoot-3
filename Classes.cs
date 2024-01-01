@@ -123,6 +123,7 @@ namespace TeaShoot_3
         [System.Xml.Serialization.XmlIgnore()]
         public List<dynamic> lib = new List<dynamic>();
 
+        private double angle2;
 
         //共通変数　及び　環境変数
         public static int camX;
@@ -205,7 +206,7 @@ namespace TeaShoot_3
                     break;
             }
         }
-        public async void Process(int i)
+        public void Process(int i)
         {
 
             if (IsUseCode)
@@ -411,11 +412,12 @@ namespace TeaShoot_3
                     break;
                 case MoveType.BoundX:
 
-                    if (x < 0 || x > 640 - width)
+                    if (x > 640 - width) x = 640 - width;
+                    if (x <= 0 || x >= 640 - width)
                     {
                         speedX *= -1;
                         RemoveBoundCount++;
-                        if (RemoveBoundCount >= RemoveBoundCountMax) removeList.Add(this);
+                        if (RemoveBoundCount >= RemoveBoundCountMax) move = MoveType.Speed;
                     }
                     x += speedX;
                     y += speedY;
@@ -423,7 +425,7 @@ namespace TeaShoot_3
                     break;
                 case MoveType.GoAwayFromBall:
 
-                    x -= 2;
+                    x -= 0.5f;
 
                     foreach (var o in objList)
                     {
@@ -441,7 +443,7 @@ namespace TeaShoot_3
                     break;
                 case MoveType.LittleNearNotHit:
 
-                    if (Math.Sqrt(Math.Pow(x - player.x, 2) + Math.Pow(y - player.y, 2)) > 70)
+                    if (Math.Sqrt(Math.Pow(x - player.x, 2) + Math.Pow(y - player.y, 2)) > 120)
                     {
                         POAngle = Math.Atan2(y - player.y, x - player.x);
                         x -=(float)(Math.Cos(POAngle) * 2);
@@ -451,7 +453,19 @@ namespace TeaShoot_3
                     break;
                 case MoveType.Surprised:
 
+                    RadianToSpeed(TwoPointToRadian(this.point, player.point));
+                    var speeds = DistanceFromPlayer() / 200;
+                    speedX *= (float)speeds;
+                    speedY *= (float)speeds;
+                    x += speedX;
+                    y += speedY;
 
+                    break;
+                case MoveType.NotNear:
+
+                    RadianToSpeed(TwoPointToRadian(this.point, player.point));
+                    x -= speedX;
+                    y -= speedY;
 
                     break;
             }
@@ -468,6 +482,20 @@ namespace TeaShoot_3
                         shotObj.isInit = true;
                         objList.Add(shotObj);
                     }
+                    break;
+                case AttackType.NormalFire:
+                    shotInterval++;
+                    if (shotInterval > 40)
+                    {
+                        shotInterval = 0;
+                        var shotObj = Obj.Clone(ResistIndexOf(shotNum));
+                        shotObj.x = x;
+                        shotObj.y = y;
+                        shotObj.isInit = true;
+                        if (shotObj.num == 28) shotObj.RadianToSpeed(TwoPointToRadian(shotObj.point, player.point));
+                        objList.Add(shotObj);
+                    }
+
                     break;
                 case AttackType.Boss1:
                     Bosses.ProcessBoss1(i);
@@ -506,6 +534,31 @@ namespace TeaShoot_3
                     }
                     if (shotInterval == -1) y -= 2;
                     break;
+                case AttackType.CycleShot:
+                    shotInterval++;
+                    if (shotInterval == 7)
+                    {
+                        shotInterval = 0;
+                        angle2 += ToRadian(50);
+
+                        var ox = Clone(ResistIndexOf(shotNum));
+                        ox.x = x;
+                        ox.y = y;
+                        ox.RadianToSpeed(angle2);
+                        objList.Add(ox);
+                    }
+
+                    break;
+                case AttackType.NormalFireSuper:
+
+                    var ox2 = Clone(ResistIndexOf(shotNum));
+                    ox2.x = x;
+                    ox2.y = y;
+                    if(ox2.num == 32) ox2.RadianToSpeed(TwoPointToRadian(point, player.point));
+                    objList.Add(ox2);
+
+                    break;
+                
             }
 
             if (!isDevelop)
@@ -566,6 +619,7 @@ namespace TeaShoot_3
         {
             if (IsUseCode)
             {
+                IsRemove = true;
                 RunScript(scripts[AccessCodeIndex].scriptRemove);
                 return IsRemove;
             }
@@ -577,7 +631,21 @@ namespace TeaShoot_3
                     if (boss1.attack != boss1.attackB1.MoveLast) boss1.y = 0;
                     boss1.attack = boss1.attackB1.MoveLast;
                     return boss1.IsRemove;
+                case 31:
 
+                    for(int i = 0; i < 360; i += 14)
+                    {
+                        var o = Clone(ResistIndexOf(14));
+                        o.remove = RemoveType.Big;
+                        o.x = x;
+                        o.y = y;
+                        o.move = MoveType.Speed;
+                        o.RadianToSpeed(ToRadian(i));
+                        o.isInit = true;
+                        objList.Add(o);
+                    }
+
+                    return true;
                 default:
                     return true;
             }
@@ -669,6 +737,19 @@ namespace TeaShoot_3
         public static void ReloadResist()
         {
             ReloadResistXML();
+            Console.WriteLine("hello");
+            scripts.Clear();
+            foreach(var o in resistList)
+            {
+                if (o.IsUseCode)
+                {
+                    if (o.Code == null) o.Code = "";
+                    if (o.CodeInit == null) o.CodeInit = "";
+                    if (o.CodeRemove == null) o.CodeRemove = "";
+                    scripts.Add(new ScriptData(CSharpScript.Create(o.Code, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeInit, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeRemove, globalsType: typeof(Obj)), o.num));
+                    o.AccessCodeIndex = scripts.Count - 1;
+                }
+            }
         }
         public static void ReloadResistXML()
         {
@@ -1064,18 +1145,37 @@ namespace TeaShoot_3
 
         //開発用の関数たち
 
+        /// <summary>
+        /// アングルからラジアンに変換します。
+        /// </summary>
+        /// <param name="angle">アングル</param>
+        /// <returns>ラジアン</returns>
         public double ToRadian(int angle)
         {
             return angle * Math.PI / 180f;
         }
+        /// <summary>
+        /// ラジアンをアングルに変換します。
+        /// </summary>
+        /// <param name="radian">ラジアン</param>
+        /// <returns>アングル</returns>
         public int ToAngle(double radian)
         {
             return (int)(radian * 180 / Math.PI);
         }
+        /// <summary>
+        /// プレイヤーからの距離を取得します。
+        /// </summary>
+        /// <returns>距離</returns>
         public double DistanceFromPlayer()
         {
             return Math.Sqrt(Math.Pow(x - player.x, 2) + Math.Pow(y - player.y, 2));
         }
+        /// <summary>
+        /// objListからnumと等しいオブジェクトを検索し、条件にあったオブジェクトをリストにして返します。
+        /// </summary>
+        /// <param name="num">検索したいnum</param>
+        /// <returns>オブジェクトのリスト</returns>
         public List<Obj> SearchFromNum(int num)
         {
             var l = new List<Obj>();
@@ -1083,20 +1183,43 @@ namespace TeaShoot_3
                 if (o.num == num) l.Add(o);
             return l;
         }
+        /// <summary>
+        /// o(オブジェクト)からの距離を求めます。
+        /// </summary>
+        /// <param name="o">オブジェクト</param>
+        /// <returns>距離</returns>
         public double DistanceFromObj(Obj o)
         {
             return Math.Sqrt(Math.Pow(o.x - player.x, 2) + Math.Pow(o.y - player.y, 2));
         }
+        /// <summary>
+        /// 二点からラジアンを求めます。
+        /// </summary>
+        /// <param name="p1">座標1</param>
+        /// <param name="p2">座標2</param>
+        /// <returns>ラジアン</returns>
         public double TwoPointToRadian(Point p1, Point p2)
         {
             return Math.Atan2(p2.y - p1.y, p2.x - p1.x);
         }
+        /// <summary>
+        /// ラジアンから速度(ベクトル)を求めます。
+        /// </summary>
+        /// <param name="radian">ラジアン</param>
         public void RadianToSpeed(double radian)
         {
             this.speedX = (float)Math.Cos(radian);
             this.speedY = (float)Math.Sin(radian);
         }
-        
+        /// <summary>
+        /// ラジアンから角度を求めます。
+        /// </summary>
+        /// <param name="radian">ラジアン</param>
+        /// <returns>Point型</returns>
+        public Point RadianToPoint(double radian)
+        {
+            return new Point(Math.Cos(radian), Math.Sin(radian));
+        }
     }
     /// <summary>
     /// プロパティグリッドのプロパティの並び順をソート
