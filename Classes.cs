@@ -739,6 +739,7 @@ namespace TeaShoot_3
             ReloadResistXML();
             Console.WriteLine("hello");
             scripts.Clear();
+            var buf = new Obj(0, ObjType.All);
             int i = 0;
             foreach(var o in resistList)
             {
@@ -748,6 +749,9 @@ namespace TeaShoot_3
                     if (o.CodeInit == null) o.CodeInit = "";
                     if (o.CodeRemove == null) o.CodeRemove = "";
                     scripts.Add(new ScriptData(CSharpScript.Create(o.Code, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeInit, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeRemove, globalsType: typeof(Obj)), o.num));
+                    try { scripts[i].script.RunAsync(buf); } catch(Exception e) { Console.WriteLine(e.Message); }
+                    try { scripts[i].scriptInit.RunAsync(buf); } catch (Exception e) { Console.WriteLine(e.Message); }
+                    try { scripts[i].scriptRemove.RunAsync(buf); } catch (Exception e) { Console.WriteLine(e.Message); }
                     o.AccessCodeIndex = i;
                     i++;
                 }

@@ -14,10 +14,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Drawing;
 
 namespace TeaShoot_3
 {
@@ -36,13 +35,21 @@ namespace TeaShoot_3
             var roslynPadAssemblies = new[]
                 {
                     typeof(RoslynCodeEditor).Assembly,
-                    typeof(GlyphExtensions).Assembly
+                    typeof(GlyphExtensions).Assembly,
                 };
 
             var assemblies = new[]
                 {
                      typeof(object).Assembly,
-                     typeof(Obj).Assembly
+                     typeof(Obj).Assembly,
+                     typeof(Enumerable).Assembly,
+                     Assembly.GetExecutingAssembly(),
+                     typeof(List<>).Assembly,
+                     typeof(Point).Assembly,
+                     typeof(Color).Assembly,
+                     Assembly.Load("System.Core"),
+                     Assembly.Load("System.Runtime"),
+                     Assembly.Load("System.Collections")
                 };
 
             var roslynHost = new CustomRoslynHost(typeof(Obj),roslynPadAssemblies,RoslynHostReferences.NamespaceDefault.With(assemblyReferences: assemblies));
