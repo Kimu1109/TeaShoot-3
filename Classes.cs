@@ -14,6 +14,8 @@ using RoslynPad.Roslyn;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
+using System.Threading;
+using System.Windows;
 
 namespace TeaShoot_3
 {
@@ -741,21 +743,32 @@ namespace TeaShoot_3
             scripts.Clear();
             var buf = new Obj(0, ObjType.All);
             int i = 0;
+            var scriptThreads = new List<Thread>();
             foreach(var o in resistList)
             {
                 if (o.IsUseCode)
                 {
-                    if (o.Code == null) o.Code = "";
-                    if (o.CodeInit == null) o.CodeInit = "";
-                    if (o.CodeRemove == null) o.CodeRemove = "";
-                    scripts.Add(new ScriptData(CSharpScript.Create(o.Code, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeInit, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeRemove, globalsType: typeof(Obj)), o.num));
-                    try { scripts[i].script.RunAsync(buf); } catch(Exception e) { Console.WriteLine(e.Message); }
-                    try { scripts[i].scriptInit.RunAsync(buf); } catch (Exception e) { Console.WriteLine(e.Message); }
-                    try { scripts[i].scriptRemove.RunAsync(buf); } catch (Exception e) { Console.WriteLine(e.Message); }
-                    o.AccessCodeIndex = i;
+                    scriptThreads.Add(new Thread(RenewScript));
+                    scriptThreads[scriptThreads.Count - 1].Start(new object[] { o, i, buf });
                     i++;
                 }
             }
+            foreach(var st in scriptThreads) st.Join();
+        }
+        private static void RenewScript(object args)
+        {
+            object[] argsTmp = (object[])args;
+            Obj o = (Obj)argsTmp[0];
+            int i = (int)argsTmp[1];
+            Obj buf = (Obj)argsTmp[2];
+            if (o.Code == null) o.Code = "";
+            if (o.CodeInit == null) o.CodeInit = "";
+            if (o.CodeRemove == null) o.CodeRemove = "";
+            scripts.Add(new ScriptData(CSharpScript.Create(o.Code, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeInit, globalsType: typeof(Obj)), CSharpScript.Create(o.CodeRemove, globalsType: typeof(Obj)), o.num));
+            try { scripts[i].script.RunAsync(buf); } catch (Exception e) { Console.WriteLine(e.Message); }
+            try { scripts[i].scriptInit.RunAsync(buf); } catch (Exception e) { Console.WriteLine(e.Message); }
+            try { scripts[i].scriptRemove.RunAsync(buf); } catch (Exception e) { Console.WriteLine(e.Message); }
+            o.AccessCodeIndex = i;
         }
         public static void ReloadResistXML()
         {
