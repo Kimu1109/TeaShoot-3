@@ -10,6 +10,7 @@ using static DxLibDLL.DX;
 using static TeaShoot_3.Obj;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
+using System.Windows;
 
 namespace TeaShoot_3
 {

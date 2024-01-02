@@ -121,7 +121,7 @@ namespace TeaShoot_3
         public bool IsRemove;
 
         [System.Xml.Serialization.XmlIgnore()]
-        public List<dynamic> lib = new List<dynamic>();
+        public List<object> lib = new List<object>();
 
         private double angle2;
 
