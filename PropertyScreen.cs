@@ -314,5 +314,15 @@ namespace TeaShoot_3
             DrawResist();
             propertyGrid1.SelectedObject = null;
         }
+
+        private void errorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ログを削除ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            scriptsError.Clear();
+        }
     }
 }

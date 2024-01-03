@@ -35,6 +35,7 @@
             columnHeader2 = new System.Windows.Forms.ColumnHeader();
             contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(components);
             追加ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            削除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             保存ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             再読み込みToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,7 +55,8 @@
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
-            削除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            errorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ログを削除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -96,7 +98,7 @@
             // 
             contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { 追加ToolStripMenuItem, 削除ToolStripMenuItem, toolStripMenuItem2, 保存ToolStripMenuItem, 再読み込みToolStripMenuItem, toolStripMenuItem4, テキストを設定ToolStripMenuItem, テキストフィットToolStripMenuItem, toolStripSeparator1, コードを編集ToolStripMenuItem, codeRemoveを編集ToolStripMenuItem, codeInitを編集ToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new System.Drawing.Size(205, 242);
+            contextMenuStrip1.Size = new System.Drawing.Size(205, 220);
             // 
             // 追加ToolStripMenuItem
             // 
@@ -105,6 +107,13 @@
             追加ToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             追加ToolStripMenuItem.Text = "追加";
             追加ToolStripMenuItem.Click += 追加ToolStripMenuItem_Click;
+            // 
+            // 削除ToolStripMenuItem
+            // 
+            削除ToolStripMenuItem.Name = "削除ToolStripMenuItem";
+            削除ToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            削除ToolStripMenuItem.Text = "削除";
+            削除ToolStripMenuItem.Click += 削除ToolStripMenuItem_Click_1;
             // 
             // toolStripMenuItem2
             // 
@@ -226,7 +235,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem });
+            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, errorToolStripMenuItem });
             menuStrip1.Location = new System.Drawing.Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -234,12 +243,20 @@
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
-            // 削除ToolStripMenuItem
+            // errorToolStripMenuItem
             // 
-            削除ToolStripMenuItem.Name = "削除ToolStripMenuItem";
-            削除ToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
-            削除ToolStripMenuItem.Text = "削除";
-            削除ToolStripMenuItem.Click += 削除ToolStripMenuItem_Click_1;
+            errorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ログを削除ToolStripMenuItem });
+            errorToolStripMenuItem.Name = "errorToolStripMenuItem";
+            errorToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            errorToolStripMenuItem.Text = "Error";
+            errorToolStripMenuItem.Click += errorToolStripMenuItem_Click;
+            // 
+            // ログを削除ToolStripMenuItem
+            // 
+            ログを削除ToolStripMenuItem.Name = "ログを削除ToolStripMenuItem";
+            ログを削除ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            ログを削除ToolStripMenuItem.Text = "ログを削除";
+            ログを削除ToolStripMenuItem.Click += ログを削除ToolStripMenuItem_Click;
             // 
             // PropertyScreen
             // 
@@ -291,5 +308,7 @@
         private System.Windows.Forms.ToolStripMenuItem codeInitを編集ToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem 削除ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem errorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ログを削除ToolStripMenuItem;
     }
 }

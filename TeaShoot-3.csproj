@@ -25,4 +25,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageReference Include="RoslynPad.Editor.Windows" Version="4.8.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="新しいフォルダー\" />
+  </ItemGroup>
 </Project>
