@@ -75,6 +75,7 @@ namespace TeaShoot_3
             mapList = new List<Obj[]>();
             ps = new PropertyScreen();
             scripts = new List<ScriptData>();
+            scriptsError = new List<ScriptError>();
             fps = 100;
             idealSleep = 1000 / fps;
             DevFileName = "map1.dat";

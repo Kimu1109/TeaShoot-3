@@ -173,6 +173,7 @@ namespace TeaShoot_3
         public static int FileVersion;
 
         public static List<ScriptData> scripts;
+        public static List<ScriptError> scriptsError;
         public void Draw()
         {
             switch (num)
@@ -1071,6 +1072,23 @@ namespace TeaShoot_3
         /// </summary>
         public static void FPS_Controller_After()
         {
+            if (scriptsError.Count != 0)
+            {
+                string errorSt = "";
+                int errorCount = 0;
+                int errorWidth = 0;
+                foreach (var e in scriptsError)
+                {
+                    string buf = e.errorTimes[0].ToString() + " - " + e.errorTimes[e.errorTimes.Count - 1].ToString() + "   " + e.error.Message + "\n";
+                    errorSt += buf;
+                    if (GetDrawStringWidth(buf, -1) > errorWidth) { errorWidth = GetDrawStringWidthToHandle(buf, -1, MiniFont); }
+                    errorCount++;
+                }
+                int errorHeight = GetFontSizeToHandle(MiniFont) * errorCount;
+                DrawBox(0, 0, errorWidth, errorHeight, GetColor(255, 255, 0), 1);
+                DrawStringToHandle(0, 0, errorSt, GetColor(0, 0, 0), MiniFont);
+            }
+
             ScreenFlip();
 
             FpsCount++;
@@ -1156,11 +1174,25 @@ namespace TeaShoot_3
             }
             catch (Exception e)
             {
-                DrawStringToHandle(200, 40, e.Message, GetColor(255, 255, 255), MiniFont);
+                bool indexOf = false;
+                foreach(var se in scriptsError)
+                {
+                    if(se.error.Message == e.Message)
+                    {
+                        se.errorTimes.Add(DateAndTime.Now);
+                        indexOf = true;
+                        break;
+                    }
+                }
+                if (!indexOf)
+                {
+                    var scError = new ScriptError();
+                    scError.error = e;
+                    scError.errorTimes.Add(DateAndTime.Now);
+                    scriptsError.Add(scError);
+                }
             }
         }
-
-
 
         //開発用の関数たち
 
@@ -1296,6 +1328,7 @@ namespace TeaShoot_3
         public Script scriptInit;
         public Script scriptRemove;
         public int num;
+        public bool hasError;
         public ScriptData(Script script, Script scriptInit, Script scriptRemove, int num)
         {
             this.script = script;
@@ -1303,6 +1336,11 @@ namespace TeaShoot_3
             this.scriptRemove = scriptRemove;
             this.num = num;
         }
+    }
+    public class ScriptError
+    {
+        public Exception error;
+        public List<DateTime> errorTimes = new List<DateTime>();
     }
 }
 public class CustomRoslynHost : RoslynHost
